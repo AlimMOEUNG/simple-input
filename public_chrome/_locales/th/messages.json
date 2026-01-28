@@ -1,0 +1,11 @@
+{
+  "extensionName": {
+    "message": "ตัวดาวน์โหลดคำบรรยายสำหรับ YouTube, Netflix, Disney +, Prime Video"
+  },
+  "extensionDescription": {
+    "message": "ดาวน์โหลดคำบรรยายและบทถอดเสียงจากเว็บไซต์สตรีมมิ่งในรูปแบบ SRT/VTT/TXT. แปลคู่/อัตโนมัติ แก้ไขก่อนดาวน์โหลด."
+  },
+  "actionTitle": {
+    "message": "ตัวดาวน์โหลดคำบรรยายสำหรับ YouTube, Netflix, Disney +, Prime Video"
+  }
+}

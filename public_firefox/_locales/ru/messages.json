@@ -1,0 +1,11 @@
+{
+  "extensionName": {
+    "message": "Загрузчик субтитров – YouTube, Netflix, Disney+"
+  },
+  "extensionDescription": {
+    "message": "Скачивай субтитры Netflix/YouTube/Disney+/Prime Video в SRT/VTT/TXT. Двойные + авто перевод, редактируй перед загрузкой"
+  },
+  "actionTitle": {
+    "message": "Загрузчик субтитров – YouTube, Netflix, Disney+"
+  }
+}

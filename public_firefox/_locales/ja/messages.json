@@ -1,0 +1,11 @@
+{
+  "extensionName": {
+    "message": "字幕ダウンローダー – YouTube, Netflix, Disney+, Prime Video"
+  },
+  "extensionDescription": {
+    "message": "Netflix/YouTube/Disney+/Prime Video の字幕を SRT/VTT/TXT でダウンロード。デュアル＋自動翻訳、ダウンロード前に編集"
+  },
+  "actionTitle": {
+    "message": "字幕ダウンローダー – YouTube, Netflix, Disney+, Prime Video"
+  }
+}

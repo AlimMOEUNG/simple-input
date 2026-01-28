@@ -1,0 +1,11 @@
+{
+  "extensionName": {
+    "message": "YouTube, Netflix, Disney +, Prime Video용 자막 다운로더"
+  },
+  "extensionDescription": {
+    "message": "스트리밍 사이트에서 SRT/VTT/TXT로 자막 및 스크립트 다운로드. 이중/자동 번역, 다운로드 전에 편집."
+  },
+  "actionTitle": {
+    "message": "YouTube, Netflix, Disney +, Prime Video용 자막 다운로더"
+  }
+}

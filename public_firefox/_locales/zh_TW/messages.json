@@ -1,0 +1,11 @@
+{
+  "extensionName": {
+    "message": "字幕下載器 – YouTube, Netflix, Disney+, Prime Video"
+  },
+  "extensionDescription": {
+    "message": "下載 Netflix/YouTube/Disney+/Prime Video 字幕為 SRT/VTT/TXT。雙字幕 + 自動翻譯，下載前可編輯"
+  },
+  "actionTitle": {
+    "message": "字幕下載器 – YouTube, Netflix, Disney+, Prime Video"
+  }
+}

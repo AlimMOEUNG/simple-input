@@ -1,0 +1,11 @@
+{
+  "extensionName": {
+    "message": "Preuzimatelj titlova za YouTube, Netflix, Disney+, Prime Video"
+  },
+  "extensionDescription": {
+    "message": "Titlovi i transkripti sa streaming servisa u SRT/VTT/TXT. Dvostruki/auto prijevod, uredi prije preuzimanja."
+  },
+  "actionTitle": {
+    "message": "Preuzimatelj titlova za YouTube, Netflix, Disney+, Prime Video"
+  }
+}

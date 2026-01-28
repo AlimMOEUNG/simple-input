@@ -1,0 +1,11 @@
+{
+  "extensionName": {
+    "message": "Преузимање титлова – YouTube, Netflix, Disney+"
+  },
+  "extensionDescription": {
+    "message": "Преузми титлове Netflix/YouTube/Disney+/Prime Video у SRT/VTT/TXT. Дупли + ауто превод, уреди пре преузимања"
+  },
+  "actionTitle": {
+    "message": "Преузимање титлова – YouTube, Netflix, Disney+"
+  }
+}

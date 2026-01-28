@@ -1,0 +1,11 @@
+{
+  "extensionName": {
+    "message": "자막 다운로드 – YouTube, Netflix, Disney+, Prime Video"
+  },
+  "extensionDescription": {
+    "message": "Netflix/YouTube/Disney+/Prime Video 자막을 SRT/VTT/TXT로 다운로드. 듀얼+자동 번역, 다운로드 전에 편집"
+  },
+  "actionTitle": {
+    "message": "자막 다운로드 – YouTube, Netflix, Disney+, Prime Video"
+  }
+}

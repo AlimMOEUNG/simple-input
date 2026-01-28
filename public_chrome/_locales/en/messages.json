@@ -1,0 +1,11 @@
+{
+  "extensionName": {
+    "message": "Extension Boilerplate"
+  },
+  "extensionDescription": {
+    "message": "Production-ready Chrome extension with Vue 3, TypeScript, and Tailwind CSS"
+  },
+  "actionTitle": {
+    "message": "Extension Boilerplate"
+  }
+}

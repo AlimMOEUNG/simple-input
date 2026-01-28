@@ -1,0 +1,11 @@
+{
+  "extensionName": {
+    "message": "Завантажувач субтитрів для YouTube, Netflix, Disney+, Prime Video"
+  },
+  "extensionDescription": {
+    "message": "Завантажуйте субтитри та стенограми з потокових сайтів у SRT/VTT/TXT. Подвійний/автоматичний переклад, редагуйте перед завантаженням."
+  },
+  "actionTitle": {
+    "message": "Завантажувач субтитрів для YouTube, Netflix, Disney+, Prime Video"
+  }
+}

@@ -1,6 +1,5 @@
 /**
  * Common types for the extension
- * Add your application-specific types here
  */
 
 export interface AppSettings {
@@ -8,8 +7,61 @@ export interface AppSettings {
   locale: string
 }
 
-// Example: Add your own types below
-// export interface YourCustomType {
-//   id: string
-//   name: string
-// }
+/**
+ * Translation provider types
+ */
+export type TranslationProvider =
+  | 'builtin'
+  | 'google'
+  | 'deepl'
+  | 'gemini'
+  | 'chatgpt'
+  | 'groq'
+  | 'ollama'
+  | 'openrouter'
+  | 'custom'
+
+/**
+ * Translation settings
+ */
+export interface TranslationSettings {
+  sourceLang: string
+  targetLang: string
+  provider: TranslationProvider
+  keyboardShortcut: string
+}
+
+/**
+ * Provider API keys and configurations
+ */
+export interface ProviderKeys {
+  deeplApiKey?: string
+  geminiConfig?: {
+    apiKey: string
+    model: string
+  }
+  chatgptConfig?: {
+    baseUrl: string
+    apiKey: string
+    model: string
+  }
+  groqConfig?: {
+    baseUrl: string
+    apiKey: string
+    model: string
+  }
+  ollamaConfig?: {
+    baseUrl: string
+    model: string
+  }
+  openrouterConfig?: {
+    baseUrl: string
+    apiKey: string
+    model: string
+  }
+  customConfig?: {
+    baseUrl: string
+    apiKey?: string
+    model: string
+  }
+}

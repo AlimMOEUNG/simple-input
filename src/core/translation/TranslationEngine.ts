@@ -1,38 +1,122 @@
 /**
- * TranslationEngine - Handles translation using different providers
- * Supports: Chrome Built-in AI, DeepL, Gemini
+ * TranslationEngine - Factory for translation providers
+ * Manages provider instantiation and translation coordination
  */
 
 import { SettingsManager } from '../storage/SettingsManager'
+import {
+  BaseTranslationProvider,
+  ChromeBuiltInProvider,
+  DeepLProvider,
+  GeminiProvider,
+  GoogleTranslateProvider,
+  OpenAICompatibleProvider,
+  OpenAIConfig,
+  getDefaultEndpoint,
+} from './providers'
 
 export class TranslationEngine {
-  private builtinTranslator: any = null
-  private builtinLanguageDetector: any = null
+  private currentProvider: BaseTranslationProvider | null = null
+  private currentProviderType: string | null = null
 
   constructor(private settings: SettingsManager) {}
 
   /**
-   * Initialize translation engine (for built-in AI)
+   * Initialize translation engine
+   * Creates the appropriate provider based on settings
    */
   async initialize(): Promise<void> {
-    const provider = this.settings.get('provider')
+    await this.reinitializeProvider()
+  }
 
-    if (provider === 'builtin') {
-      try {
-        // Check if Chrome AI Translation API is available
-        if ('translation' in self && 'createTranslator' in (self as any).translation) {
-          console.log('[TranslationEngine] Chrome Built-in AI available')
-        } else {
-          console.warn('[TranslationEngine] Chrome Built-in AI not available')
-        }
+  /**
+   * Reinitialize provider when settings change
+   */
+  async reinitializeProvider(): Promise<void> {
+    const providerType = this.settings.get('provider')
 
-        // Check language detector
-        if ('translation' in self && 'createDetector' in (self as any).translation) {
-          console.log('[TranslationEngine] Language detector available')
+    // If provider hasn't changed, don't reinitialize
+    if (providerType === this.currentProviderType && this.currentProvider) {
+      return
+    }
+
+    // Destroy old provider
+    if (this.currentProvider) {
+      this.currentProvider.destroy()
+      this.currentProvider = null
+    }
+
+    // Create new provider
+    this.currentProvider = await this.createProvider(providerType)
+    this.currentProviderType = providerType
+
+    // Initialize provider
+    if (this.currentProvider) {
+      await this.currentProvider.initialize()
+      console.log(`[TranslationEngine] Initialized provider: ${this.currentProvider.name}`)
+    }
+  }
+
+  /**
+   * Create provider instance based on type
+   */
+  private async createProvider(providerType: string): Promise<BaseTranslationProvider> {
+    switch (providerType) {
+      case 'builtin':
+        return new ChromeBuiltInProvider()
+
+      case 'google':
+        return new GoogleTranslateProvider()
+
+      case 'deepl': {
+        const { providerKeys } = await chrome.storage.local.get('providerKeys')
+        const apiKey = providerKeys?.deeplApiKey
+        if (!apiKey) {
+          throw new Error(
+            'DeepL API key is required. Please configure it in the extension settings.'
+          )
         }
-      } catch (error) {
-        console.error('[TranslationEngine] Failed to initialize built-in AI:', error)
+        return new DeepLProvider(apiKey)
       }
+
+      case 'gemini': {
+        const { providerKeys } = await chrome.storage.local.get('providerKeys')
+        const geminiConfig = providerKeys?.geminiConfig
+        if (!geminiConfig?.apiKey) {
+          throw new Error(
+            'Gemini API key is required. Please configure it in the extension settings.'
+          )
+        }
+        return new GeminiProvider(geminiConfig.apiKey, geminiConfig.model || 'gemini-1.5-flash')
+      }
+
+      case 'chatgpt':
+      case 'groq':
+      case 'ollama':
+      case 'openrouter':
+      case 'custom': {
+        const { providerKeys } = await chrome.storage.local.get('providerKeys')
+        const configKey = `${providerType}Config`
+        const config = providerKeys?.[configKey]
+
+        if (!config) {
+          throw new Error(
+            `${providerType} configuration is required. Please configure it in the extension settings.`
+          )
+        }
+
+        const openaiConfig: OpenAIConfig = {
+          providerType: providerType as any,
+          baseUrl: config.baseUrl || getDefaultEndpoint(providerType as any),
+          apiKey: config.apiKey,
+          model: config.model,
+        }
+
+        return new OpenAICompatibleProvider(openaiConfig)
+      }
+
+      default:
+        throw new Error(`Unknown provider: ${providerType}`)
     }
   }
 
@@ -40,26 +124,30 @@ export class TranslationEngine {
    * Translate text using the configured provider
    */
   async translateText(text: string, targetLang?: string): Promise<string> {
-    const provider = this.settings.get('provider')
+    // Ensure provider is initialized
+    if (!this.currentProvider) {
+      await this.reinitializeProvider()
+    }
+
+    if (!this.currentProvider) {
+      throw new Error('No translation provider available')
+    }
+
     const sourceLang = this.settings.get('sourceLang')
     const target = targetLang || this.settings.get('targetLang')
 
-    console.log(`[TranslationEngine] Translating with ${provider}: "${text.substring(0, 50)}..."`)
+    console.log(
+      `[TranslationEngine] Translating with ${this.currentProvider.name}: "${text.substring(0, 50)}..."`
+    )
 
     try {
-      switch (provider) {
-        case 'builtin':
-          return await this.translateWithBuiltin(text, target, sourceLang)
+      const translated = await this.currentProvider.translateText(text, {
+        targetLanguage: target,
+        sourceLanguage: sourceLang === 'auto' ? undefined : sourceLang,
+      })
 
-        case 'deepl':
-          return await this.translateWithDeepL(text, target, sourceLang)
-
-        case 'gemini':
-          return await this.translateWithGemini(text, target)
-
-        default:
-          throw new Error(`Unknown provider: ${provider}`)
-      }
+      console.log(`[TranslationEngine] Translation successful`)
+      return translated
     } catch (error) {
       console.error('[TranslationEngine] Translation failed:', error)
       throw error
@@ -67,118 +155,13 @@ export class TranslationEngine {
   }
 
   /**
-   * Translate using Chrome Built-in AI
-   */
-  private async translateWithBuiltin(
-    text: string,
-    targetLang: string,
-    sourceLang: string
-  ): Promise<string> {
-    try {
-      // Check if API is available
-      if (!('translation' in self) || !(self as any).translation?.createTranslator) {
-        throw new Error(
-          'Chrome Built-in AI is not available. Please use Chrome 143+ or another provider.'
-        )
-      }
-
-      const translationAPI = (self as any).translation
-
-      // Create translator for language pair
-      const translatorKey = `${sourceLang === 'auto' ? 'auto' : sourceLang}-${targetLang}`
-
-      // If we don't have a translator for this pair, create one
-      if (!this.builtinTranslator || this.builtinTranslator.key !== translatorKey) {
-        const options: any = { targetLanguage: targetLang }
-        if (sourceLang !== 'auto') {
-          options.sourceLanguage = sourceLang
-        }
-
-        this.builtinTranslator = await translationAPI.createTranslator(options)
-        this.builtinTranslator.key = translatorKey
-
-        console.log(`[TranslationEngine] Created built-in translator: ${translatorKey}`)
-      }
-
-      // Translate
-      const result = await this.builtinTranslator.translate(text)
-      console.log(`[TranslationEngine] Built-in translation successful`)
-      return result
-    } catch (error: any) {
-      // Check if it's a "not available" error
-      if (error?.message?.includes('NotAllowedError') || error?.message?.includes('download')) {
-        throw new Error(
-          'Translation model needs to be downloaded. Please click on the page first, then try again.'
-        )
-      }
-      throw error
-    }
-  }
-
-  /**
-   * Translate using DeepL API (via background script)
-   */
-  private async translateWithDeepL(
-    text: string,
-    targetLang: string,
-    sourceLang: string
-  ): Promise<string> {
-    // Get API key from storage
-    const { providerKeys } = await chrome.storage.local.get('providerKeys')
-    const apiKey = providerKeys?.deeplApiKey
-
-    if (!apiKey) {
-      throw new Error('DeepL API key is required. Please configure it in the extension settings.')
-    }
-
-    // Send translation request to background script
-    const response = await chrome.runtime.sendMessage({
-      type: 'TRANSLATE_DEEPL',
-      text,
-      targetLang,
-      apiKey,
-      sourceLang: sourceLang === 'auto' ? undefined : sourceLang,
-    })
-
-    if (!response.success) {
-      throw new Error(response.error || 'DeepL translation failed')
-    }
-
-    return response.data.translation
-  }
-
-  /**
-   * Translate using Gemini API (via background script)
-   */
-  private async translateWithGemini(text: string, targetLang: string): Promise<string> {
-    // Get API key from storage
-    const { providerKeys } = await chrome.storage.local.get('providerKeys')
-    const apiKey = providerKeys?.geminiApiKey
-
-    if (!apiKey) {
-      throw new Error('Gemini API key is required. Please configure it in the extension settings.')
-    }
-
-    // Send translation request to background script
-    const response = await chrome.runtime.sendMessage({
-      type: 'TRANSLATE_GEMINI',
-      text,
-      targetLang,
-      apiKey,
-    })
-
-    if (!response.success) {
-      throw new Error(response.error || 'Gemini translation failed')
-    }
-
-    return response.data.translation
-  }
-
-  /**
    * Clean up resources
    */
   destroy(): void {
-    this.builtinTranslator = null
-    this.builtinLanguageDetector = null
+    if (this.currentProvider) {
+      this.currentProvider.destroy()
+      this.currentProvider = null
+    }
+    this.currentProviderType = null
   }
 }

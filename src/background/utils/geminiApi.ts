@@ -9,7 +9,8 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
  * Validate Gemini API key
  */
 export async function validateGeminiKey(
-  apiKey: string
+  apiKey: string,
+  modelName: string = 'gemini-1.5-flash'
 ): Promise<{ success: boolean; error?: string }> {
   if (!apiKey) {
     return { success: false, error: 'API key required' }
@@ -17,7 +18,7 @@ export async function validateGeminiKey(
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey)
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+    const model = genAI.getGenerativeModel({ model: modelName })
 
     // Simple test to validate the API key
     await model.generateContent('Test')
@@ -41,7 +42,8 @@ export async function validateGeminiKey(
 export async function translateWithGemini(
   text: string,
   targetLang: string,
-  apiKey: string
+  apiKey: string,
+  modelName: string = 'gemini-1.5-flash'
 ): Promise<{ success: boolean; translation?: string; sameLanguage?: boolean; error?: string }> {
   if (!apiKey) {
     return { success: false, error: 'API key required' }
@@ -51,7 +53,7 @@ export async function translateWithGemini(
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey)
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+    const model = genAI.getGenerativeModel({ model: modelName })
 
     const result = await model.generateContent(prompt)
     const response = await result.response

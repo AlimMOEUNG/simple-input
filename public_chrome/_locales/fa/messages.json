@@ -1,11 +1,11 @@
 {
-  "extensionName": {
+  "actionTitle": {
     "message": "دانلودکننده زیرنویس برای YouTube, Netflix, Disney +, Prime Video"
   },
   "extensionDescription": {
     "message": "زیرنویس و رونوشت‌ها را از سایت‌های پخش در SRT/VTT/TXT دانلود کنید. ترجمه دوگانه/خودکار، قبل از دانلود ویرایش کنید."
   },
-  "actionTitle": {
+  "extensionName": {
     "message": "دانلودکننده زیرنویس برای YouTube, Netflix, Disney +, Prime Video"
   }
 }

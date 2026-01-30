@@ -1,11 +1,11 @@
 {
-  "extensionName": {
-    "message": "Λήψη υποτίτλων – YouTube, Netflix, Disney+"
+  "actionTitle": {
+    "message": "Λήψη υποτίτλων για YouTube, Netflix, Disney+, Prime Video"
   },
   "extensionDescription": {
-    "message": "Κατέβασε υπότιτλους από Netflix/YouTube/Disney+/Prime Video σε SRT/VTT/TXT. Διπλοί + αυτόματη μετάφραση, επεξεργασία πριν τη λήψη"
+    "message": "Λήψη υποτίτλων & μεταγραφών από υπηρεσίες ροής σε SRT/VTT/TXT. Διπλή/αυτόματη μετάφραση, επεξεργασία πριν λήψη."
   },
-  "actionTitle": {
-    "message": "Λήψη υποτίτλων – YouTube, Netflix, Disney+"
+  "extensionName": {
+    "message": "Λήψη υποτίτλων για YouTube, Netflix, Disney+, Prime Video"
   }
 }

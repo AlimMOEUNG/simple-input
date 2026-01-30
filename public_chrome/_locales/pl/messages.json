@@ -1,11 +1,11 @@
 {
-  "extensionName": {
+  "actionTitle": {
     "message": "Pobieracz napisów dla YouTube, Netflix, Disney +, Prime Video"
   },
   "extensionDescription": {
     "message": "Pobierz napisy i transkrypcje z serwisów streamingowych w SRT/VTT/TXT. Podwójne/automatyczne tłumaczenie, edytuj przed pobraniem."
   },
-  "actionTitle": {
+  "extensionName": {
     "message": "Pobieracz napisów dla YouTube, Netflix, Disney +, Prime Video"
   }
 }

@@ -1,11 +1,11 @@
 {
-  "extensionName": {
+  "actionTitle": {
     "message": "Téléchargeur de sous-titres pour YouTube, Netflix, Disney+, Prime Video"
   },
   "extensionDescription": {
     "message": "Téléchargez sous-titres et transcriptions de vos sites de streaming préférés en SRT/VTT/TXT. Traduction double/auto, éditez avant DL."
   },
-  "actionTitle": {
+  "extensionName": {
     "message": "Téléchargeur de sous-titres pour YouTube, Netflix, Disney+, Prime Video"
   }
 }

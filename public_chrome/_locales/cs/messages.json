@@ -1,11 +1,11 @@
 {
-  "extensionName": {
+  "actionTitle": {
     "message": "Stahovač titulků pro YouTube, Netflix, Disney +, Prime Video"
   },
   "extensionDescription": {
     "message": "Stahujte titulky a přepisy z vašich oblíbených streamovacích služeb ve formátu SRT/VTT/TXT. Duální/automatický překlad, úpravy před stažením."
   },
-  "actionTitle": {
+  "extensionName": {
     "message": "Stahovač titulků pro YouTube, Netflix, Disney +, Prime Video"
   }
 }

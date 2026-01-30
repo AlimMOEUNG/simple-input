@@ -1,11 +1,11 @@
 {
-  "extensionName": {
+  "actionTitle": {
     "message": "YouTube, Netflix, Disney+, Prime Video కోసం సబ్‌టైటిల్ డౌన్‌లోడర్"
   },
   "extensionDescription": {
     "message": "స్ట్రీమింగ్ సైట్‌ల నుండి SRT/VTT/TXTలో ఉపశీర్షికలు మరియు ట్రాన్‌స్క్రిప్ట్‌లను డౌన్‌లోడ్ చేయండి. ద్వంద్వ/ఆటో అనువాదం, డౌన్‌లోడ్ చేయడానికి ముందు సవరించండి."
   },
-  "actionTitle": {
+  "extensionName": {
     "message": "YouTube, Netflix, Disney+, Prime Video కోసం సబ్‌టైటిల్ డౌన్‌లోడర్"
   }
 }

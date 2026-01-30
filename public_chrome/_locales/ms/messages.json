@@ -1,11 +1,11 @@
 {
-  "extensionName": {
+  "actionTitle": {
     "message": "Pemuat Turun Sarikata untuk YouTube, Netflix, Disney+, Prime Video"
   },
   "extensionDescription": {
     "message": "Muat turun sarikata dan transkrip dari laman penstriman dalam SRT/VTT/TXT. Dwi/automatik terjemahan, edit sebelum muat turun."
   },
-  "actionTitle": {
+  "extensionName": {
     "message": "Pemuat Turun Sarikata untuk YouTube, Netflix, Disney+, Prime Video"
   }
 }

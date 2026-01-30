@@ -1,11 +1,11 @@
 {
-  "extensionName": {
-    "message": "ಉಪಶೀರ್ಷಿಕೆ ಡೌನ್‌ಲೋಡರ್ – YouTube, Netflix, Disney+"
+  "actionTitle": {
+    "message": "YouTube, Netflix, Disney+, Prime Video ಗಾಗಿ ಉಪಶೀರ್ಷಿಕೆ ಡೌನ್‌ಲೋಡರ್"
   },
   "extensionDescription": {
-    "message": "Netflix/YouTube/Disney+/Prime Video ಉಪಶೀರ್ಷಿಕೆಗಳನ್ನು SRT/VTT/TXT ನಲ್ಲಿ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ. ಡ್ಯುಯಲ್ + ಸ್ವಯಂ ಅನುವಾದ, ಡೌನ್‌ಲೋಡ್ 전에 ಸಂಪಾದನೆ"
+    "message": "ಸ್ಟ್ರೀಮಿಂಗ್ ಸೈಟ್‌ಗಳಿಂದ SRT/VTT/TXT ನಲ್ಲಿ ಉಪಶೀರ್ಷಿಕೆಗಳು ಮತ್ತು ಪ್ರತಿಗಳನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ. ದ್ವಿಮುಖ/ಸ್ವಯಂ ಅನುವಾದ, ಡೌನ್‌ಲೋಡ್ ಮಾಡುವ ಮೊದಲು ಸಂಪಾದಿಸಿ."
   },
-  "actionTitle": {
-    "message": "ಉಪಶೀರ್ಷಿಕೆ ಡೌನ್‌ಲೋಡರ್ – YouTube, Netflix, Disney+"
+  "extensionName": {
+    "message": "YouTube, Netflix, Disney+, Prime Video ಗಾಗಿ ಉಪಶೀರ್ಷಿಕೆ ಡೌನ್‌ಲೋಡರ್"
   }
 }

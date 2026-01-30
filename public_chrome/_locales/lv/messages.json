@@ -1,11 +1,11 @@
 {
-  "extensionName": {
+  "actionTitle": {
     "message": "Subtitru lejupielādētājs priekš YouTube, Netflix, Disney+, Prime Video"
   },
   "extensionDescription": {
     "message": "Lejupielādējiet subtitrus un transkripcijas no straumēšanas vietnēm SRT/VTT/TXT. Divkāršs/automātisks tulkojums, rediģējiet pirms lejupielādes."
   },
-  "actionTitle": {
+  "extensionName": {
     "message": "Subtitru lejupielādētājs priekš YouTube, Netflix, Disney+, Prime Video"
   }
 }

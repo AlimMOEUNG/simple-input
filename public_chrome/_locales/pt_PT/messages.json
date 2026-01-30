@@ -1,11 +1,11 @@
 {
-  "extensionName": {
+  "actionTitle": {
     "message": "Descarregador de legendas para YouTube, Netflix, Disney+, Prime Video"
   },
   "extensionDescription": {
     "message": "Descarregue legendas e transcrições de sites de streaming em SRT/VTT/TXT. Tradução dupla/automática, edite antes de descarregar."
   },
-  "actionTitle": {
+  "extensionName": {
     "message": "Descarregador de legendas para YouTube, Netflix, Disney+, Prime Video"
   }
 }

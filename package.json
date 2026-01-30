@@ -12,6 +12,12 @@
     "build:all:dev": "npm run build:chrome:dev && npm run build:firefox:dev",
     "i18n:check": "node scripts/check-translations.js",
     "i18n:sync": "node scripts/check-translations.js --fix",
+    "locales:init": "node scripts/init-master.cjs",
+    "locales:init:chrome": "node scripts/init-master.cjs chrome",
+    "locales:init:firefox": "node scripts/init-master.cjs firefox",
+    "locales:deploy": "node scripts/deploy-master.cjs",
+    "locales:deploy:chrome": "node scripts/deploy-master.cjs chrome",
+    "locales:deploy:firefox": "node scripts/deploy-master.cjs firefox",
     "type-check": "vue-tsc --noEmit",
     "lint": "eslint . --fix",
     "format": "prettier --write src/"

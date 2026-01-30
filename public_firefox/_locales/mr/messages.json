@@ -1,11 +1,11 @@
 {
-  "extensionName": {
-    "message": "सबटायटल डाउनलोडर – YouTube, Netflix, Disney+"
+  "actionTitle": {
+    "message": "YouTube, Netflix, Disney +, Prime Video साठी उपशीर्षक डाउनलोडर"
   },
   "extensionDescription": {
-    "message": "Netflix/YouTube/Disney+/Prime Video सबटायटल SRT/VTT/TXT मध्ये डाउनलोड करा. ड्युअल + ऑटो ट्रान्सलेशन, डाउनलोडपूर्व संपादन"
+    "message": "स्ट्रीमिंग साइट्सवरून SRT/VTT/TXT मध्ये सबटायटल्स आणि ट्रान्सक्रिप्ट डाउनलोड करा. दुहेरी/ऑटो अनुवाद, डाउनलोड करण्यापूर्वी संपादित करा."
   },
-  "actionTitle": {
-    "message": "सबटायटल डाउनलोडर – YouTube, Netflix, Disney+"
+  "extensionName": {
+    "message": "YouTube, Netflix, Disney +, Prime Video साठी उपशीर्षक डाउनलोडर"
   }
 }

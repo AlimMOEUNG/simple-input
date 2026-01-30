@@ -1,11 +1,11 @@
 {
-  "extensionName": {
-    "message": "Altyazı İndirici – YouTube, Netflix, Disney+"
+  "actionTitle": {
+    "message": "YouTube, Netflix, Disney +, Prime Video için Altyazı İndirici"
   },
   "extensionDescription": {
-    "message": "Netflix/YouTube/Disney+/Prime Video altyazılarını SRT/VTT/TXT olarak indir. Çift + otomatik çeviri, indirmeden önce düzenle"
+    "message": "Akış sitelerinden SRT/VTT/TXT biçiminde altyazıları ve transkriptleri indirin. İkili/otomatik çeviri, indirmeden önce düzenleyin."
   },
-  "actionTitle": {
-    "message": "Altyazı İndirici – YouTube, Netflix, Disney+"
+  "extensionName": {
+    "message": "YouTube, Netflix, Disney +, Prime Video için Altyazı İndirici"
   }
 }

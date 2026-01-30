@@ -1,11 +1,11 @@
 {
-  "extensionName": {
-    "message": "Prenosnik podnapisov – YouTube, Netflix, Disney+"
+  "actionTitle": {
+    "message": "Prenosnik podnapisov za YouTube, Netflix, Disney+, Prime Video"
   },
   "extensionDescription": {
-    "message": "Prenesi podnapise Netflix/YouTube/Disney+/Prime Video v SRT/VTT/TXT. Dvojni + samodejni prevod, uredi pred prenosom"
+    "message": "Prenesite podnapise in prepise iz pretočnih storitev v obliki SRT/VTT/TXT. Dvojni/samodejni prevod, uredite pred prenosom."
   },
-  "actionTitle": {
-    "message": "Prenosnik podnapisov – YouTube, Netflix, Disney+"
+  "extensionName": {
+    "message": "Prenosnik podnapisov za YouTube, Netflix, Disney+, Prime Video"
   }
 }

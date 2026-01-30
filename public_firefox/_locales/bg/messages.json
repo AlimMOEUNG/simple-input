@@ -1,11 +1,11 @@
 {
-  "extensionName": {
-    "message": "Сваляне на субтитри – YouTube, Netflix, Disney+"
+  "actionTitle": {
+    "message": "Сваляне на субтитри за YouTube, Netflix, Disney+, Prime Video"
   },
   "extensionDescription": {
-    "message": "Сваляй субтитри от Netflix/YouTube/Disney+/Prime Video в SRT/VTT/TXT. Двойни + авто превод, редакция преди сваляне"
+    "message": "Изтеглете субтитри и преписи от любимите си стрийминг сайтове в SRT/VTT/TXT. Двоен/авто превод, ред. преди сваляне."
   },
-  "actionTitle": {
-    "message": "Сваляне на субтитри – YouTube, Netflix, Disney+"
+  "extensionName": {
+    "message": "Сваляне на субтитри за YouTube, Netflix, Disney+, Prime Video"
   }
 }

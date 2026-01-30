@@ -1,11 +1,11 @@
 {
-  "extensionName": {
-    "message": "Baixador de subtítols – YouTube, Netflix, Disney+"
+  "actionTitle": {
+    "message": "Baixador de subtítols per a YouTube, Netflix, Disney+, Prime Video"
   },
   "extensionDescription": {
-    "message": "Descarrega subtítols Netflix/YouTube/Disney+/Prime Video en SRT/VTT/TXT. Dobles + traducció automàtica, edita abans de baixar"
+    "message": "Baixeu subtítols i transcripcions dels vostres llocs de reproducció preferits en SRT/VTT/TXT. Traducció dual/automàtica, editeu-los abans de baixar-los."
   },
-  "actionTitle": {
-    "message": "Baixador de subtítols – YouTube, Netflix, Disney+"
+  "extensionName": {
+    "message": "Baixador de subtítols per a YouTube, Netflix, Disney+, Prime Video"
   }
 }

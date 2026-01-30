@@ -1,11 +1,11 @@
 {
-  "extensionName": {
-    "message": "Kipakuzi cha Manukuu – YouTube, Netflix, Disney+"
+  "actionTitle": {
+    "message": "Kipakuzi cha Manukuu kwa YouTube, Netflix, Disney+, Prime Video"
   },
   "extensionDescription": {
-    "message": "Pakua manukuu za Netflix/YouTube/Disney+/Prime Video kama SRT/VTT/TXT. Dual + auto translation, hariri kabla ya kupakua"
+    "message": "Pakua manukuu na manukuu kutoka tovuti za kutiririsha katika SRT/VTT/TXT. Tafsiri mbili/otomatiki, hariri kabla ya kupakua."
   },
-  "actionTitle": {
-    "message": "Kipakuzi cha Manukuu – YouTube, Netflix, Disney+"
+  "extensionName": {
+    "message": "Kipakuzi cha Manukuu kwa YouTube, Netflix, Disney+, Prime Video"
   }
 }

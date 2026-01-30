@@ -1,11 +1,11 @@
 {
-  "extensionName": {
-    "message": "Feliratletöltő – YouTube, Netflix, Disney+"
+  "actionTitle": {
+    "message": "Feliratletöltő a YouTube, Netflix, Disney +, Prime Video számára"
   },
   "extensionDescription": {
-    "message": "Tölts le Netflix/YouTube/Disney+/Prime Video feliratokat SRT/VTT/TXT-ben. Dupla + automatikus fordítás, szerkeszd letöltés előtt"
+    "message": "Feliratok és átiratok streaming szolgáltatásokból SRT/VTT/TXT-ben. Kettős/auto fordítás, szerkesztés letöltés előtt."
   },
-  "actionTitle": {
-    "message": "Feliratletöltő – YouTube, Netflix, Disney+"
+  "extensionName": {
+    "message": "Feliratletöltő a YouTube, Netflix, Disney +, Prime Video számára"
   }
 }

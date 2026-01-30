@@ -1,11 +1,11 @@
 {
-  "extensionName": {
-    "message": "Subtitrų siuntiklis – YouTube, Netflix, Disney+"
+  "actionTitle": {
+    "message": "Subtitrų siuntiklis, skirtas „YouTube“, „Netflix“, „Disney+“, „Prime Video“"
   },
   "extensionDescription": {
-    "message": "Atsisiųsk Netflix/YouTube/Disney+/Prime Video subtitrus SRT/VTT/TXT. Dvigubi + autom. vertimas, taisyk prieš atsisiuntimą"
+    "message": "Atsisiųskite subtitrus ir transkripcijas iš srautinio perdavimo svetainių SRT/VTT/TXT. Dvigubas/auto vertimas, redaguokite prieš atsisiunčiant."
   },
-  "actionTitle": {
-    "message": "Subtitrų siuntiklis – YouTube, Netflix, Disney+"
+  "extensionName": {
+    "message": "Subtitrų siuntiklis, skirtas „YouTube“, „Netflix“, „Disney+“, „Prime Video“"
   }
 }

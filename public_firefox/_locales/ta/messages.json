@@ -1,11 +1,11 @@
 {
-  "extensionName": {
-    "message": "உபதலைப்புகள் பதிவிறக்கி – YouTube, Netflix"
+  "actionTitle": {
+    "message": "YouTube, Netflix, Disney+, Prime Video-க்கான சப்டைட்டில் டவுன்லோடர்"
   },
   "extensionDescription": {
-    "message": "Netflix/YouTube/Disney+/Prime Video உபதலைப்புகள் SRT/VTT/TXT. இரட்டை + ஆட்டோ மொழிபெயர்ப்பு, பதிவிறக்கத்திற்கு முன் திருத்தவும்"
+    "message": "ஸ்ட்ரீமிங் தளங்களிலிருந்து SRT/VTT/TXT இல் வசனங்கள் மற்றும் டிரான்ஸ்கிரிப்ட்களைப் பதிவிறக்கவும். இரட்டை/தானியங்கு மொழிபெயர்ப்பு, பதிவிறக்கும் முன் திருத்தவும்."
   },
-  "actionTitle": {
-    "message": "உபதலைப்புகள் பதிவிறக்கி – YouTube, Netflix"
+  "extensionName": {
+    "message": "YouTube, Netflix, Disney+, Prime Video-க்கான சப்டைட்டில் டவுன்லோடர்"
   }
 }

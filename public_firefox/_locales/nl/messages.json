@@ -1,11 +1,11 @@
 {
-  "extensionName": {
-    "message": "Ondertitel Downloader – YouTube, Netflix, Disney+"
+  "actionTitle": {
+    "message": "Ondertitel Downloader voor YouTube, Netflix, Disney+, Prime Video"
   },
   "extensionDescription": {
-    "message": "Download ondertitels van Netflix/YouTube/Disney+/Prime Video in SRT/VTT/TXT. Dubbel + automatische vertaling, bewerk vóór download"
+    "message": "Download ondertitels en transcripten van streamingdiensten in SRT/VTT/TXT. Dubbele/auto vertaling, bewerk vóór download."
   },
-  "actionTitle": {
-    "message": "Ondertitel Downloader – YouTube, Netflix, Disney+"
+  "extensionName": {
+    "message": "Ondertitel Downloader voor YouTube, Netflix, Disney+, Prime Video"
   }
 }

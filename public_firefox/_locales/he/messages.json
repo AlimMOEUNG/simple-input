@@ -1,11 +1,11 @@
 {
-  "extensionName": {
-    "message": "מוריד כתוביות – YouTube, Netflix, Disney+"
+  "actionTitle": {
+    "message": "מוריד כתוביות עבור YouTube, Netflix, Disney +, Prime Video"
   },
   "extensionDescription": {
-    "message": "הורד כתוביות מ-Netflix/YouTube/Disney+/Prime Video ב-SRT/VTT/TXT. כפול + תרגום אוטו, ערוך לפני ההורדה"
+    "message": "הורד כתוביות ותמלילים מאתרי סטרימינג ב-SRT/VTT/TXT. תרגום כפול/אוטומטי, ערוך לפני הורדה."
   },
-  "actionTitle": {
-    "message": "מוריד כתוביות – YouTube, Netflix, Disney+"
+  "extensionName": {
+    "message": "מוריד כתוביות עבור YouTube, Netflix, Disney +, Prime Video"
   }
 }

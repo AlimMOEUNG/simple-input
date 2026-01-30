@@ -1,11 +1,11 @@
 {
-  "extensionName": {
-    "message": "Undertextnedladdare – YouTube, Netflix, Disney+"
+  "actionTitle": {
+    "message": "Undertextnedladdare för YouTube, Netflix, Disney+, Prime Video"
   },
   "extensionDescription": {
-    "message": "Ladda ner undertexter Netflix/YouTube/Disney+/Prime Video i SRT/VTT/TXT. Dubbla + autoöversättning, redigera före nedladdning"
+    "message": "Ladda ner undertexter och transkriptioner från streamingtjänster i SRT/VTT/TXT. Dubbel/automatisk översättning, redigera före nedladdning."
   },
-  "actionTitle": {
-    "message": "Undertextnedladdare – YouTube, Netflix, Disney+"
+  "extensionName": {
+    "message": "Undertextnedladdare för YouTube, Netflix, Disney+, Prime Video"
   }
 }

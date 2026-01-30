@@ -1,11 +1,11 @@
 {
-  "extensionName": {
+  "actionTitle": {
     "message": "محمّل الترجمات لـ YouTube, Netflix, Disney +, Prime Video"
   },
   "extensionDescription": {
     "message": "قم بتنزيل الترجمات والنصوص من مواقع البث المفضلة لديك بتنسيق SRT/VTT/TXT. ترجمة مزدوجة/آلية، قم بالتحرير قبل التنزيل."
   },
-  "actionTitle": {
+  "extensionName": {
     "message": "محمّل الترجمات لـ YouTube, Netflix, Disney +, Prime Video"
   }
 }

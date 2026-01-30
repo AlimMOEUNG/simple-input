@@ -1,11 +1,11 @@
 {
-  "extensionName": {
+  "actionTitle": {
     "message": "Undertekstnedlaster for YouTube, Netflix, Disney+, Prime Video"
   },
   "extensionDescription": {
     "message": "Last ned undertekster og transkripsjoner fra strømmetjenester i SRT/VTT/TXT. Dobbel/auto oversettelse, rediger før nedlasting."
   },
-  "actionTitle": {
+  "extensionName": {
     "message": "Undertekstnedlaster for YouTube, Netflix, Disney+, Prime Video"
   }
 }

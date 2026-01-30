@@ -1,11 +1,11 @@
 {
-  "extensionName": {
-    "message": "Tekstityslataaja – YouTube, Netflix, Disney+"
+  "actionTitle": {
+    "message": "Tekstityslataaja YouTube, Netflix, Disney+, Prime Video varten"
   },
   "extensionDescription": {
-    "message": "Lataa tekstityksiä Netflix/YouTube/Disney+/Prime Video SRT/VTT/TXT. Kaksois + automaattikäännös, muokkaa ennen latausta"
+    "message": "Lataa tekstitykset & transkriptiot striimauspalveluista SRT/VTT/TXT. Kaksois/auto käännös, muokkaa ennen lataamista."
   },
-  "actionTitle": {
-    "message": "Tekstityslataaja – YouTube, Netflix, Disney+"
+  "extensionName": {
+    "message": "Tekstityslataaja YouTube, Netflix, Disney+, Prime Video varten"
   }
 }

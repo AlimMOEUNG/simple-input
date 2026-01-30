@@ -1,11 +1,11 @@
 {
-  "extensionName": {
-    "message": "Downloader ng Subtitle – YouTube, Netflix, Disney+"
+  "actionTitle": {
+    "message": "Downloader ng Subtitle para sa YouTube, Netflix, Disney+, Prime Video"
   },
   "extensionDescription": {
-    "message": "I-download ang subtitle sa Netflix/YouTube/Disney+/Prime Video bilang SRT/VTT/TXT. Dual + auto translation, i-edit bago mag-download"
+    "message": "I-download ang mga subtitle at transkrip mula sa streaming sites sa SRT/VTT/TXT. Dual/auto translate, i-edit bago i-download."
   },
-  "actionTitle": {
-    "message": "Downloader ng Subtitle – YouTube, Netflix, Disney+"
+  "extensionName": {
+    "message": "Downloader ng Subtitle para sa YouTube, Netflix, Disney+, Prime Video"
   }
 }

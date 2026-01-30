@@ -1,11 +1,11 @@
 {
-  "extensionName": {
-    "message": "Descărcător de subtitrări – YouTube, Netflix"
+  "actionTitle": {
+    "message": "Descărcător de subtitrări pentru YouTube, Netflix, Disney+, Prime Video"
   },
   "extensionDescription": {
-    "message": "Descarcă subtitrări Netflix/YouTube/Disney+/Prime Video în SRT/VTT/TXT. Dublu + traducere automată, editează înainte de descărcare"
+    "message": "Descărcați subtitrări și transcrieri de pe site-uri de streaming în SRT/VTT/TXT. Traducere dublă/automată, editați înainte de descărcare."
   },
-  "actionTitle": {
-    "message": "Descărcător de subtitrări – YouTube, Netflix"
+  "extensionName": {
+    "message": "Descărcător de subtitrări pentru YouTube, Netflix, Disney+, Prime Video"
   }
 }

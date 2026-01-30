@@ -1,41 +1,41 @@
 /**
  * Vue 3 composable wrapper for i18n system
  * Provides reactive locale switching and translation helpers
+ * Uses Chrome storage sync to persist locale across devices
  */
 
-import { ref, computed } from 'vue'
+import { watch } from 'vue'
 import { useI18n, setLocale as setI18nLocale, type Locale } from '@/core/utils/i18n'
-
-const currentLocale = ref<Locale>('en')
+import { useStorageState } from './useStorageState'
 
 export function useI18nWrapper() {
-  const { t } = useI18n()
+  const { t, locale: i18nLocale } = useI18n()
 
-  // Reactive locale
-  const reactiveLocale = computed(() => currentLocale.value)
+  // Load locale from Chrome storage sync (synced across devices)
+  const { value: locale } = useStorageState<Locale>('locale', i18nLocale.value, {
+    storageArea: 'sync',
+  })
 
-  // Set locale and persist to storage
-  const setLocale = async (newLocale: Locale) => {
-    currentLocale.value = newLocale
+  // Sync storage changes to i18n system
+  watch(
+    locale,
+    (newLocale) => {
+      if (newLocale && newLocale !== i18nLocale.value) {
+        setI18nLocale(newLocale)
+      }
+    },
+    { immediate: true }
+  )
+
+  // Set locale (automatically persists via useStorageState)
+  const setLocale = (newLocale: Locale) => {
+    locale.value = newLocale
     setI18nLocale(newLocale)
-
-    // Persist to chrome.storage
-    await chrome.storage.sync.set({ locale: newLocale })
-  }
-
-  // Load locale from storage on init
-  const loadLocale = async () => {
-    const result = await chrome.storage.sync.get('locale')
-    if (result.locale) {
-      currentLocale.value = result.locale
-      setI18nLocale(result.locale)
-    }
   }
 
   return {
     t,
-    locale: reactiveLocale,
+    locale,
     setLocale,
-    loadLocale,
   }
 }

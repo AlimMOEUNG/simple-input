@@ -40,7 +40,6 @@
         <label class="block text-xs font-medium mb-1">{{ t('sourceLanguage') }}</label>
         <select
           v-model="settings.sourceLang"
-          @change="saveSettings"
           class="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
         >
           <option value="auto">{{ t('autoDetect') }}</option>
@@ -64,7 +63,6 @@
         <label class="block text-xs font-medium mb-1">{{ t('targetLanguage') }}</label>
         <select
           v-model="settings.targetLang"
-          @change="saveSettings"
           class="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
         >
           <option value="en">English</option>
@@ -434,10 +432,18 @@
 import { ref, computed, onMounted } from 'vue'
 import { Sun, Moon, Monitor } from 'lucide-vue-next'
 import { useI18nWrapper } from '@/composables/useI18nWrapper'
+import { useThemeMode } from '@/composables/useThemeMode'
+import { useSettings } from '@/composables/useSettings'
 import type { SupportedLocale } from '@/core/utils/i18n'
 
 // i18n setup
-const { t, locale, setLocale, loadLocale } = useI18nWrapper()
+const { t, locale, setLocale } = useI18nWrapper()
+
+// Theme management
+const { themeMode, cycleTheme } = useThemeMode()
+
+// Settings management
+const { settings, providerConfigs } = useSettings()
 
 // Language selector
 const availableLanguages = [
@@ -456,12 +462,9 @@ const uiLocale = computed<SupportedLocale>({
   },
 })
 
-// Theme management
-type Theme = 'auto' | 'light' | 'dark'
-const currentTheme = ref<Theme>('auto')
-
+// Theme icon computed
 const themeIcon = computed(() => {
-  switch (currentTheme.value) {
+  switch (themeMode.value) {
     case 'light':
       return Sun
     case 'dark':
@@ -469,58 +472,6 @@ const themeIcon = computed(() => {
     default:
       return Monitor
   }
-})
-
-// Settings
-const settings = ref({
-  sourceLang: 'auto',
-  targetLang: 'en',
-  provider: 'google' as
-    | 'google'
-    | 'builtin'
-    | 'deepl'
-    | 'gemini'
-    | 'chatgpt'
-    | 'groq'
-    | 'ollama'
-    | 'openrouter'
-    | 'custom',
-  keyboardShortcut: 'Alt+T',
-})
-
-// Provider configurations
-const providerConfigs = ref({
-  deepl: {
-    apiKey: '',
-  },
-  gemini: {
-    apiKey: '',
-    model: 'gemini-1.5-flash',
-  },
-  chatgpt: {
-    apiKey: '',
-    baseUrl: 'https://api.openai.com/v1',
-    model: 'gpt-4o-mini',
-  },
-  groq: {
-    apiKey: '',
-    baseUrl: 'https://api.groq.com/openai/v1',
-    model: 'llama-3.3-70b-versatile',
-  },
-  ollama: {
-    baseUrl: 'http://localhost:11434/v1',
-    model: 'llama3.2',
-  },
-  openrouter: {
-    apiKey: '',
-    baseUrl: 'https://openrouter.ai/api/v1',
-    model: 'meta-llama/llama-3.3-70b-instruct',
-  },
-  custom: {
-    baseUrl: '',
-    apiKey: '',
-    model: '',
-  },
 })
 
 // Validation status
@@ -547,150 +498,11 @@ const validationMessage = ref({
 const shortcutError = ref('')
 
 // Load settings on mount
-onMounted(async () => {
-  await loadLocale()
-  await loadSettings()
-  await loadTheme()
-  await loadApiKeys()
+onMounted(() => {
+  // Settings are automatically loaded by useStorageState
   // Check if current provider configuration is complete
   checkProviderConfiguration()
 })
-
-async function loadSettings() {
-  try {
-    const result = await chrome.storage.sync.get('settings')
-    if (result.settings) {
-      settings.value = { ...settings.value, ...result.settings }
-    }
-  } catch (error) {
-    console.error('Failed to load settings:', error)
-  }
-}
-
-async function saveSettings() {
-  try {
-    await chrome.storage.sync.set({ settings: settings.value })
-    console.log('Settings saved')
-  } catch (error) {
-    console.error('Failed to save settings:', error)
-  }
-}
-
-async function loadApiKeys() {
-  try {
-    const result = await chrome.storage.local.get('providerKeys')
-    if (result.providerKeys) {
-      // Load DeepL
-      if (result.providerKeys.deeplApiKey) {
-        providerConfigs.value.deepl.apiKey = result.providerKeys.deeplApiKey
-        validationStatus.value.deepl = 'success'
-        validationMessage.value.deepl = `✓ ${t('apiKeyValidCached')}`
-      }
-
-      // Load Gemini
-      if (result.providerKeys.geminiConfig) {
-        providerConfigs.value.gemini.apiKey = result.providerKeys.geminiConfig.apiKey || ''
-        providerConfigs.value.gemini.model =
-          result.providerKeys.geminiConfig.model || 'gemini-1.5-flash'
-        validationStatus.value.gemini = 'success'
-        validationMessage.value.gemini = `✓ ${t('validationLoaded')}`
-      }
-
-      // Load ChatGPT
-      if (result.providerKeys.chatgptConfig) {
-        providerConfigs.value.chatgpt = {
-          ...providerConfigs.value.chatgpt,
-          ...result.providerKeys.chatgptConfig,
-        }
-        validationStatus.value.chatgpt = 'success'
-        validationMessage.value.chatgpt = `✓ ${t('validationLoaded')}`
-      }
-
-      // Load Groq
-      if (result.providerKeys.groqConfig) {
-        providerConfigs.value.groq = {
-          ...providerConfigs.value.groq,
-          ...result.providerKeys.groqConfig,
-        }
-        validationStatus.value.groq = 'success'
-        validationMessage.value.groq = `✓ ${t('validationLoaded')}`
-      }
-
-      // Load Ollama
-      if (result.providerKeys.ollamaConfig) {
-        providerConfigs.value.ollama = {
-          ...providerConfigs.value.ollama,
-          ...result.providerKeys.ollamaConfig,
-        }
-        validationStatus.value.ollama = 'success'
-        validationMessage.value.ollama = `✓ ${t('validationLoaded')}`
-      }
-
-      // Load OpenRouter
-      if (result.providerKeys.openrouterConfig) {
-        providerConfigs.value.openrouter = {
-          ...providerConfigs.value.openrouter,
-          ...result.providerKeys.openrouterConfig,
-        }
-        validationStatus.value.openrouter = 'success'
-        validationMessage.value.openrouter = `✓ ${t('validationLoaded')}`
-      }
-
-      // Load Custom
-      if (result.providerKeys.customConfig) {
-        providerConfigs.value.custom = {
-          ...providerConfigs.value.custom,
-          ...result.providerKeys.customConfig,
-        }
-        validationStatus.value.custom = 'success'
-        validationMessage.value.custom = `✓ ${t('validationLoaded')}`
-      }
-    }
-  } catch (error) {
-    console.error('Failed to load API keys:', error)
-  }
-}
-
-async function saveProviderConfig(provider: string) {
-  try {
-    const result = await chrome.storage.local.get('providerKeys')
-    const providerKeys = result.providerKeys || {}
-
-    // Save configuration based on provider type
-    switch (provider) {
-      case 'deepl':
-        providerKeys.deeplApiKey = providerConfigs.value.deepl.apiKey
-        break
-      case 'gemini':
-        providerKeys.geminiConfig = {
-          apiKey: providerConfigs.value.gemini.apiKey,
-          model: providerConfigs.value.gemini.model,
-        }
-        break
-      case 'chatgpt':
-        providerKeys.chatgptConfig = providerConfigs.value.chatgpt
-        break
-      case 'groq':
-        providerKeys.groqConfig = providerConfigs.value.groq
-        break
-      case 'ollama':
-        providerKeys.ollamaConfig = providerConfigs.value.ollama
-        break
-      case 'openrouter':
-        providerKeys.openrouterConfig = providerConfigs.value.openrouter
-        break
-      case 'custom':
-        providerKeys.customConfig = providerConfigs.value.custom
-        break
-    }
-
-    await chrome.storage.local.set({ providerKeys })
-    console.log(`${provider} configuration saved`)
-  } catch (error) {
-    console.error(`Failed to save ${provider} config:`, error)
-    throw error
-  }
-}
 
 async function validateProviderConfig(provider: string) {
   // Reset validation state
@@ -741,7 +553,7 @@ async function validateProviderConfig(provider: string) {
       validationStatus.value[provider as keyof typeof validationStatus.value] = 'success'
       validationMessage.value[provider as keyof typeof validationMessage.value] =
         `✓ ${t('validationSuccess')}`
-      await saveProviderConfig(provider)
+      // Configuration is automatically saved by useStorageState
     } else {
       validationStatus.value[provider as keyof typeof validationStatus.value] = 'error'
       validationMessage.value[provider as keyof typeof validationMessage.value] =
@@ -755,8 +567,7 @@ async function validateProviderConfig(provider: string) {
 }
 
 function onProviderChange() {
-  saveSettings()
-
+  // Settings are automatically saved by useStorageState
   // Check if the selected provider has the required configuration
   checkProviderConfiguration()
 }
@@ -873,46 +684,7 @@ function validateAndSaveShortcut() {
   }
 
   shortcutError.value = ''
-  saveSettings()
-}
-
-// Theme functions
-function cycleTheme() {
-  const themes: Theme[] = ['auto', 'light', 'dark']
-  const currentIndex = themes.indexOf(currentTheme.value)
-  currentTheme.value = themes[(currentIndex + 1) % themes.length]
-  applyTheme(currentTheme.value)
-  saveTheme(currentTheme.value)
-}
-
-function applyTheme(theme: Theme) {
-  const html = document.documentElement
-
-  if (theme === 'auto') {
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    html.classList.toggle('dark', prefersDark)
-  } else {
-    html.classList.toggle('dark', theme === 'dark')
-  }
-}
-
-function saveTheme(theme: Theme) {
-  chrome.storage.sync.set({ themeMode: theme })
-}
-
-async function loadTheme() {
-  const result = await chrome.storage.sync.get('themeMode')
-  if (result.themeMode) {
-    currentTheme.value = result.themeMode
-  }
-  applyTheme(currentTheme.value)
-
-  // Watch for system theme changes
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-    if (currentTheme.value === 'auto') {
-      applyTheme('auto')
-    }
-  })
+  // Settings are automatically saved by useStorageState
 }
 </script>
 

@@ -45,13 +45,31 @@ initialize()
 
 // Listen for settings changes from popup
 chrome.storage.onChanged.addListener((changes, areaName) => {
+  // Handle legacy settings changes (for backward compatibility during migration)
   if (areaName === 'sync' && changes.settings) {
-    console.log('[Content] Settings changed, reloading...')
+    console.log('[Content] Legacy settings changed, reloading...')
+    settings.load().then(() => {
+      console.log('[Content] Settings reloaded')
+      keyboardHandler.rebuildShortcutMap()
+    })
+  }
+
+  // Handle new presets settings changes
+  if (areaName === 'sync' && changes.presetsSettings) {
+    console.log('[Content] Presets settings changed, reloading...')
+
     // Reload settings
     settings.load().then(() => {
       console.log('[Content] Settings reloaded')
+
+      // Rebuild shortcut map when presets change
+      keyboardHandler.rebuildShortcutMap()
+      console.log('[Content] Shortcut map rebuilt')
+
       // Reinitialize provider if provider changed
-      if (changes.settings.newValue?.provider !== changes.settings.oldValue?.provider) {
+      if (
+        changes.presetsSettings.newValue?.provider !== changes.presetsSettings.oldValue?.provider
+      ) {
         console.log('[Content] Provider changed, reinitializing...')
         engine.reinitializeProvider().then(() => {
           console.log('[Content] Provider reinitialized')

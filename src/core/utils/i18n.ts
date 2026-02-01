@@ -66,6 +66,20 @@ const enTranslations = {
   keyboardShortcut: 'Keyboard Shortcut',
   keyboardShortcutDescription: 'Press the desired keyboard combination (e.g., Alt+T, Ctrl+Shift+T)',
 
+  // Presets
+  presetName: 'Preset Name',
+  presetNamePlaceholder: 'My Preset',
+  addPreset: 'Add Preset',
+  deletePreset: 'Delete Preset',
+  presetDeleteConfirm: 'Are you sure you want to delete "{name}"?',
+  shortcutInvalidFormat: 'Invalid shortcut format. Must have a modifier (e.g., Alt+T, Alt, Ctrl+1)',
+  shortcutDuplicate: 'Shortcut already used by "{name}"',
+  shortcutTooManyKeys: 'Too many keys. Maximum 2 keys after modifiers (e.g., Alt+T+1)',
+  shortcutHelp: 'Supports: modifier (Alt), modifier+key (Alt+T), or sequences (Alt+T+1). Max 2 keys.',
+  cannotDeleteLastPreset: 'Cannot delete the last preset',
+  saveChanges: 'Save',
+  unsavedChanges: 'Unsaved changes',
+
   // Usage
   howToUse: 'How to use:',
   usageSelect: 'Select text and press {shortcut} to translate it',
@@ -117,6 +131,21 @@ const frTranslations: TranslationMap = {
   keyboardShortcut: 'Raccourci clavier',
   keyboardShortcutDescription:
     'Appuyez sur la combinaison de touches souhaitée (ex: Alt+T, Ctrl+Shift+T)',
+  presetName: 'Nom de la triplette',
+  presetNamePlaceholder: 'Ma triplette',
+  addPreset: 'Ajouter une triplette',
+  deletePreset: 'Supprimer la triplette',
+  presetDeleteConfirm: 'Êtes-vous sûr de vouloir supprimer "{name}" ?',
+  shortcutInvalidFormat:
+    'Format de raccourci invalide. Doit avoir un modificateur (ex: Alt+T, Alt, Ctrl+1)',
+  shortcutDuplicate: 'Raccourci déjà utilisé par "{name}"',
+  shortcutTooManyKeys:
+    'Trop de touches. Maximum 2 touches après les modificateurs (ex: Alt+T+1)',
+  shortcutHelp:
+    'Supporte: modificateur (Alt), modificateur+touche (Alt+T), ou séquences (Alt+T+1). Max 2 touches.',
+  cannotDeleteLastPreset: 'Impossible de supprimer la dernière triplette',
+  saveChanges: 'Enregistrer',
+  unsavedChanges: 'Modifications non enregistrées',
   howToUse: 'Comment utiliser :',
   usageSelect: 'Sélectionnez du texte et appuyez sur {shortcut} pour le traduire',
   usageInput:
@@ -162,6 +191,21 @@ const esTranslations: TranslationMap = {
   keyboardShortcut: 'Atajo de teclado',
   keyboardShortcutDescription:
     'Presione la combinación de teclas deseada (ej: Alt+T, Ctrl+Shift+T)',
+  presetName: 'Nombre del preset',
+  presetNamePlaceholder: 'Mi preset',
+  addPreset: 'Agregar preset',
+  deletePreset: 'Eliminar preset',
+  presetDeleteConfirm: '¿Está seguro de que desea eliminar "{name}"?',
+  shortcutInvalidFormat:
+    'Formato de atajo inválido. Debe tener un modificador (ej: Alt+T, Alt, Ctrl+1)',
+  shortcutDuplicate: 'Atajo ya utilizado por "{name}"',
+  shortcutTooManyKeys:
+    'Demasiadas teclas. Máximo 2 teclas después de los modificadores (ej: Alt+T+1)',
+  shortcutHelp:
+    'Soporta: modificador (Alt), modificador+tecla (Alt+T), o secuencias (Alt+T+1). Máx 2 teclas.',
+  cannotDeleteLastPreset: 'No se puede eliminar el último preset',
+  saveChanges: 'Guardar',
+  unsavedChanges: 'Cambios no guardados',
   howToUse: 'Cómo usar:',
   usageSelect: 'Seleccione texto y presione {shortcut} para traducirlo',
   usageInput: 'Enfóquese en un campo de entrada y presione {shortcut} para traducir el contenido',
@@ -206,6 +250,21 @@ const deTranslations: TranslationMap = {
   keyboardShortcut: 'Tastenkombination',
   keyboardShortcutDescription:
     'Drücken Sie die gewünschte Tastenkombination (z.B. Alt+T, Ctrl+Shift+T)',
+  presetName: 'Voreinstellungsname',
+  presetNamePlaceholder: 'Meine Voreinstellung',
+  addPreset: 'Voreinstellung hinzufügen',
+  deletePreset: 'Voreinstellung löschen',
+  presetDeleteConfirm: 'Möchten Sie "{name}" wirklich löschen?',
+  shortcutInvalidFormat:
+    'Ungültiges Tastenkombinationsformat. Muss einen Modifikator haben (z.B. Alt+T, Alt, Ctrl+1)',
+  shortcutDuplicate: 'Tastenkombination wird bereits von "{name}" verwendet',
+  shortcutTooManyKeys:
+    'Zu viele Tasten. Maximal 2 Tasten nach Modifikatoren (z.B. Alt+T+1)',
+  shortcutHelp:
+    'Unterstützt: Modifikator (Alt), Modifikator+Taste (Alt+T), oder Sequenzen (Alt+T+1). Max 2 Tasten.',
+  cannotDeleteLastPreset: 'Die letzte Voreinstellung kann nicht gelöscht werden',
+  saveChanges: 'Speichern',
+  unsavedChanges: 'Nicht gespeicherte Änderungen',
   howToUse: 'Verwendung:',
   usageSelect: 'Wählen Sie Text aus und drücken Sie {shortcut}, um ihn zu übersetzen',
   usageInput:
@@ -249,6 +308,18 @@ const zhTranslations: TranslationMap = {
   autoDetect: '自动检测',
   keyboardShortcut: '键盘快捷键',
   keyboardShortcutDescription: '按下所需的键盘组合（例如：Alt+T, Ctrl+Shift+T）',
+  presetName: '预设名称',
+  presetNamePlaceholder: '我的预设',
+  addPreset: '添加预设',
+  deletePreset: '删除预设',
+  presetDeleteConfirm: '确定要删除 "{name}" 吗？',
+  shortcutInvalidFormat: '快捷键格式无效。必须包含修饰键（例如：Alt+T, Alt, Ctrl+1）',
+  shortcutDuplicate: '快捷键已被 "{name}" 使用',
+  shortcutTooManyKeys: '按键过多。修饰键后最多 2 个按键（例如：Alt+T+1）',
+  shortcutHelp: '支持：修饰键（Alt），修饰键+按键（Alt+T），或序列（Alt+T+1）。最多 2 个按键。',
+  cannotDeleteLastPreset: '无法删除最后一个预设',
+  saveChanges: '保存',
+  unsavedChanges: '未保存的更改',
   howToUse: '如何使用：',
   usageSelect: '选择文本并按 {shortcut} 翻译',
   usageInput: '聚焦输入字段并按 {shortcut} 翻译内容',
@@ -292,6 +363,21 @@ const jaTranslations: TranslationMap = {
   keyboardShortcut: 'キーボードショートカット',
   keyboardShortcutDescription:
     '希望のキーボード組み合わせを押してください（例：Alt+T, Ctrl+Shift+T）',
+  presetName: 'プリセット名',
+  presetNamePlaceholder: 'マイプリセット',
+  addPreset: 'プリセットを追加',
+  deletePreset: 'プリセットを削除',
+  presetDeleteConfirm: '"{name}" を削除してもよろしいですか？',
+  shortcutInvalidFormat:
+    'ショートカット形式が無効です。修飾キーが必要です（例：Alt+T, Alt, Ctrl+1）',
+  shortcutDuplicate: 'ショートカットは既に "{name}" で使用されています',
+  shortcutTooManyKeys:
+    'キーが多すぎます。修飾キーの後に最大2つのキー（例：Alt+T+1）',
+  shortcutHelp:
+    'サポート：修飾キー（Alt），修飾キー+キー（Alt+T），またはシーケンス（Alt+T+1）。最大2キー。',
+  cannotDeleteLastPreset: '最後のプリセットは削除できません',
+  saveChanges: '保存',
+  unsavedChanges: '未保存の変更',
   howToUse: '使い方：',
   usageSelect: 'テキストを選択して {shortcut} を押して翻訳',
   usageInput: '入力フィールドにフォーカスして {shortcut} を押してコンテンツを翻訳',

@@ -1,7 +1,10 @@
 /**
  * SettingsManager - Manages extension settings from chrome.storage
  * Provides simple get/set interface for settings
+ * Now supports multiple presets with migration from old format
  */
+
+import type { TranslationPreset, PresetsSettings, TranslationProvider } from '@/types/common'
 
 export interface Settings {
   sourceLang: string // ISO 639-1 code or 'auto'
@@ -10,7 +13,22 @@ export interface Settings {
   keyboardShortcut: string // e.g., 'Alt+T'
 }
 
+/**
+ * Generate a UUID v4
+ */
+function generateUUID(): string {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID()
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0
+    const v = c === 'x' ? r : (r & 0x3) | 0x8
+    return v.toString(16)
+  })
+}
+
 export class SettingsManager {
+  // Legacy settings (for backward compatibility during migration)
   private settings: Settings = {
     sourceLang: 'auto',
     targetLang: 'en',
@@ -18,49 +36,147 @@ export class SettingsManager {
     keyboardShortcut: 'Alt+T',
   }
 
+  // New presets-based settings
+  private presetsSettings: PresetsSettings = {
+    presets: [
+      {
+        id: generateUUID(),
+        name: 'Preset 1',
+        sourceLang: 'auto',
+        targetLang: 'en',
+        keyboardShortcut: 'Alt+T',
+        createdAt: Date.now(),
+      },
+    ],
+    activePresetId: null,
+    provider: 'google',
+  }
+
   /**
    * Load settings from chrome.storage.sync
+   * Handles migration from old format to new presets format
    */
   async load(): Promise<void> {
     try {
-      const result = await chrome.storage.sync.get('settings')
-      if (result.settings) {
-        this.settings = { ...this.settings, ...result.settings }
+      const result = await chrome.storage.sync.get(['settings', 'presetsSettings'])
+
+      // If new format exists, use it
+      if (result.presetsSettings) {
+        this.presetsSettings = result.presetsSettings
+        if (!this.presetsSettings.activePresetId && this.presetsSettings.presets.length > 0) {
+          this.presetsSettings.activePresetId = this.presetsSettings.presets[0].id
+        }
+        console.log('[SettingsManager] Presets settings loaded:', this.presetsSettings)
       }
-      console.log('[SettingsManager] Settings loaded:', this.settings)
+      // Migrate from old format
+      else if (result.settings) {
+        console.log('[SettingsManager] Migrating old settings to presets format...')
+        this.settings = { ...this.settings, ...result.settings }
+
+        // Create first preset from old settings
+        const migratedPreset: TranslationPreset = {
+          id: generateUUID(),
+          name: 'Preset 1',
+          sourceLang: this.settings.sourceLang,
+          targetLang: this.settings.targetLang,
+          keyboardShortcut: this.settings.keyboardShortcut,
+          createdAt: Date.now(),
+        }
+
+        this.presetsSettings = {
+          presets: [migratedPreset],
+          activePresetId: migratedPreset.id,
+          provider: this.settings.provider as TranslationProvider,
+        }
+
+        // Save migrated settings
+        await chrome.storage.sync.set({ presetsSettings: this.presetsSettings })
+        await chrome.storage.sync.remove('settings')
+        console.log('[SettingsManager] Migration complete')
+      }
+      // No existing settings
+      else {
+        this.presetsSettings.activePresetId = this.presetsSettings.presets[0].id
+        console.log('[SettingsManager] No settings found, using defaults')
+      }
     } catch (error) {
       console.error('[SettingsManager] Failed to load settings:', error)
     }
   }
 
   /**
-   * Get a setting value
+   * Get a setting value (legacy method for backward compatibility)
+   * Uses the first preset's settings
    */
   get<K extends keyof Settings>(key: K): Settings[K] {
-    return this.settings[key]
+    if (key === 'provider') {
+      return this.presetsSettings.provider as Settings[K]
+    }
+    const firstPreset = this.presetsSettings.presets[0]
+    return firstPreset[key as keyof TranslationPreset] as Settings[K]
   }
 
   /**
-   * Get all settings
+   * Get all settings (legacy method)
    */
   getAll(): Settings {
-    return { ...this.settings }
+    const firstPreset = this.presetsSettings.presets[0]
+    return {
+      sourceLang: firstPreset.sourceLang,
+      targetLang: firstPreset.targetLang,
+      provider: this.presetsSettings.provider as 'builtin' | 'deepl' | 'gemini',
+      keyboardShortcut: firstPreset.keyboardShortcut,
+    }
   }
 
   /**
-   * Set a setting value
+   * Get all presets
+   */
+  getPresets(): TranslationPreset[] {
+    return this.presetsSettings.presets
+  }
+
+  /**
+   * Get a preset by ID
+   */
+  getPresetById(id: string): TranslationPreset | undefined {
+    return this.presetsSettings.presets.find((p) => p.id === id)
+  }
+
+  /**
+   * Get the global provider
+   */
+  getProvider(): TranslationProvider {
+    return this.presetsSettings.provider
+  }
+
+  /**
+   * Get all presets settings
+   */
+  getPresetsSettings(): PresetsSettings {
+    return this.presetsSettings
+  }
+
+  /**
+   * Set a setting value (legacy method)
    */
   set<K extends keyof Settings>(key: K, value: Settings[K]): void {
-    this.settings[key] = value
+    if (key === 'provider') {
+      this.presetsSettings.provider = value as TranslationProvider
+    } else {
+      // Update first preset
+      const firstPreset = this.presetsSettings.presets[0]
+      ;(firstPreset[key as keyof TranslationPreset] as any) = value
+    }
   }
 
   /**
-   * Update settings and save to storage
+   * Update settings and save to storage (legacy method)
    */
   async save(): Promise<void> {
     try {
-      await chrome.storage.sync.set({ settings: this.settings })
-      console.log('[SettingsManager] Settings saved:', this.settings)
+      await chrome.storage.sync.set({ presetsSettings: this.presetsSettings })
+      console.log('[SettingsManager] Settings saved:', this.presetsSettings)
     } catch (error) {
       console.error('[SettingsManager] Failed to save settings:', error)
     }

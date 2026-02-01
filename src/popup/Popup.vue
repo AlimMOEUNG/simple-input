@@ -35,56 +35,11 @@
 
     <!-- Main Content -->
     <div class="flex-1 flex flex-col p-3 space-y-2.5">
-      <!-- Source Language -->
-      <div>
-        <label class="block text-xs font-medium mb-1">{{ t('sourceLanguage') }}</label>
-        <select
-          v-model="settings.sourceLang"
-          class="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-        >
-          <option value="auto">{{ t('autoDetect') }}</option>
-          <option value="en">English</option>
-          <option value="fr">French</option>
-          <option value="es">Spanish</option>
-          <option value="de">German</option>
-          <option value="it">Italian</option>
-          <option value="pt">Portuguese</option>
-          <option value="nl">Dutch</option>
-          <option value="pl">Polish</option>
-          <option value="ru">Russian</option>
-          <option value="zh">Chinese</option>
-          <option value="ja">Japanese</option>
-          <option value="ko">Korean</option>
-        </select>
-      </div>
-
-      <!-- Target Language -->
-      <div>
-        <label class="block text-xs font-medium mb-1">{{ t('targetLanguage') }}</label>
-        <select
-          v-model="settings.targetLang"
-          class="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-        >
-          <option value="en">English</option>
-          <option value="fr">French</option>
-          <option value="es">Spanish</option>
-          <option value="de">German</option>
-          <option value="it">Italian</option>
-          <option value="pt">Portuguese</option>
-          <option value="nl">Dutch</option>
-          <option value="pl">Polish</option>
-          <option value="ru">Russian</option>
-          <option value="zh">Chinese</option>
-          <option value="ja">Japanese</option>
-          <option value="ko">Korean</option>
-        </select>
-      </div>
-
-      <!-- Provider -->
+      <!-- Provider (GLOBAL) -->
       <div>
         <label class="block text-xs font-medium mb-1">{{ t('providerLabel') }}</label>
         <select
-          v-model="settings.provider"
+          v-model="presetsSettings.provider"
           @change="onProviderChange"
           class="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
         >
@@ -101,7 +56,7 @@
       </div>
 
       <!-- DeepL API Key -->
-      <div v-if="settings.provider === 'deepl'" class="space-y-1.5">
+      <div v-if="presetsSettings.provider === 'deepl'" class="space-y-1.5">
         <label class="block text-xs font-medium">{{ t('apiKeyLabelDeepL') }}</label>
         <input
           type="password"
@@ -134,7 +89,7 @@
       </div>
 
       <!-- Gemini Configuration -->
-      <div v-if="settings.provider === 'gemini'" class="space-y-1.5">
+      <div v-if="presetsSettings.provider === 'gemini'" class="space-y-1.5">
         <label class="block text-xs font-medium">{{ t('apiKeyLabelGemini') }}</label>
         <input
           type="password"
@@ -174,7 +129,7 @@
       </div>
 
       <!-- ChatGPT Configuration -->
-      <div v-if="settings.provider === 'chatgpt'" class="space-y-1.5">
+      <div v-if="presetsSettings.provider === 'chatgpt'" class="space-y-1.5">
         <label class="block text-xs font-medium">{{ t('apiKeyLabelOpenAI') }}</label>
         <input
           type="password"
@@ -214,7 +169,7 @@
       </div>
 
       <!-- Groq Configuration -->
-      <div v-if="settings.provider === 'groq'" class="space-y-1.5">
+      <div v-if="presetsSettings.provider === 'groq'" class="space-y-1.5">
         <label class="block text-xs font-medium">{{ t('apiKeyLabelGroq') }}</label>
         <input
           type="password"
@@ -254,7 +209,7 @@
       </div>
 
       <!-- Ollama Configuration -->
-      <div v-if="settings.provider === 'ollama'" class="space-y-1.5">
+      <div v-if="presetsSettings.provider === 'ollama'" class="space-y-1.5">
         <label class="block text-xs font-medium">{{ t('labelBaseUrl') }}</label>
         <input
           type="text"
@@ -294,7 +249,7 @@
       </div>
 
       <!-- OpenRouter Configuration -->
-      <div v-if="settings.provider === 'openrouter'" class="space-y-1.5">
+      <div v-if="presetsSettings.provider === 'openrouter'" class="space-y-1.5">
         <label class="block text-xs font-medium">{{ t('apiKeyLabelOpenRouter') }}</label>
         <input
           type="password"
@@ -338,7 +293,7 @@
       </div>
 
       <!-- Custom OpenAI-compatible Configuration -->
-      <div v-if="settings.provider === 'custom'" class="space-y-1.5">
+      <div v-if="presetsSettings.provider === 'custom'" class="space-y-1.5">
         <label class="block text-xs font-medium">{{ t('labelBaseUrl') }}</label>
         <input
           type="text"
@@ -390,29 +345,44 @@
         </p>
       </div>
 
-      <!-- Keyboard Shortcut -->
-      <div>
-        <label class="block text-xs font-medium mb-1">{{ t('keyboardShortcut') }}</label>
-        <input
-          v-model="settings.keyboardShortcut"
-          @blur="validateAndSaveShortcut"
-          @keydown="handleShortcutInput"
-          placeholder="Alt+T"
-          class="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono"
+      <!-- Presets Section -->
+      <div class="border-t border-gray-200 dark:border-gray-700 pt-2">
+        <PresetTabs
+          :presets="presetsSettings.presets"
+          :active-preset-id="presetsSettings.activePresetId"
+          @select-preset="selectPreset"
+          @add-preset="addPreset"
         />
-        <p v-if="shortcutError" class="text-[10px] text-red-600 mt-0.5">{{ shortcutError }}</p>
+
+        <PresetEditor
+          v-if="activePreset"
+          :preset="activePreset"
+          :all-presets="presetsSettings.presets"
+          :can-delete="presetsSettings.presets.length > 1"
+          @update-preset="updatePreset"
+          @delete-preset="deletePreset"
+        />
       </div>
 
       <!-- Usage Instructions -->
       <div class="border-t border-gray-200 dark:border-gray-700 pt-2">
-        <p class="text-[10px] text-gray-600 dark:text-gray-400">
+        <p class="text-[10px] text-gray-600 dark:text-gray-400 font-medium mb-1">
           {{ t('howToUse') }}
         </p>
+        <div class="space-y-0.5">
+          <div
+            v-for="preset in presetsSettings.presets"
+            :key="preset.id"
+            class="text-[10px] text-gray-600 dark:text-gray-400"
+          >
+            <strong>{{ preset.name }}:</strong> {{ preset.keyboardShortcut }}
+            <span class="text-gray-500 dark:text-gray-500">
+              ({{ preset.sourceLang }} → {{ preset.targetLang }})
+            </span>
+          </div>
+        </div>
         <p class="text-[10px] text-gray-600 dark:text-gray-400 mt-1">
-          {{ t('usageSelect', { params: { shortcut: settings.keyboardShortcut } }) }}
-        </p>
-        <p class="text-[10px] text-gray-600 dark:text-gray-400 mt-0.5">
-          {{ t('usageInput', { params: { shortcut: settings.keyboardShortcut } }) }}
+          {{ t('usageWorks') }}
         </p>
       </div>
     </div>
@@ -434,7 +404,11 @@ import { Sun, Moon, Monitor } from 'lucide-vue-next'
 import { useI18nWrapper } from '@/composables/useI18nWrapper'
 import { useThemeMode } from '@/composables/useThemeMode'
 import { useSettings } from '@/composables/useSettings'
+import { usePresetsSettings } from '@/composables/usePresetsSettings'
 import type { SupportedLocale } from '@/core/utils/i18n'
+import type { TranslationPreset } from '@/types/common'
+import PresetTabs from '@/components/PresetTabs.vue'
+import PresetEditor from '@/components/PresetEditor.vue'
 
 // i18n setup
 const { t, locale, setLocale } = useI18nWrapper()
@@ -442,8 +416,19 @@ const { t, locale, setLocale } = useI18nWrapper()
 // Theme management
 const { themeMode, cycleTheme } = useThemeMode()
 
-// Settings management
-const { settings, providerConfigs } = useSettings()
+// Presets settings management
+const {
+  presetsSettings,
+  addPreset: addPresetHelper,
+  updatePreset: updatePresetHelper,
+  deletePreset: deletePresetHelper,
+  setActivePreset,
+  getActivePreset,
+  isLoading: _isLoadingPresets,
+} = usePresetsSettings()
+
+// Provider configs (still uses old useSettings for provider keys)
+const { providerConfigs } = useSettings()
 
 // Language selector
 const availableLanguages = [
@@ -495,7 +480,31 @@ const validationMessage = ref({
   custom: '',
 })
 
-const shortcutError = ref('')
+// Get active preset
+const activePreset = computed(() => {
+  return getActivePreset()
+})
+
+// Preset management functions
+function selectPreset(id: string) {
+  setActivePreset(id)
+}
+
+function addPreset() {
+  addPresetHelper()
+}
+
+function updatePreset(updatedPreset: TranslationPreset) {
+  updatePresetHelper(updatedPreset)
+}
+
+function deletePreset(id: string) {
+  if (presetsSettings.value.presets.length <= 1) {
+    alert(t('cannotDeleteLastPreset'))
+    return
+  }
+  deletePresetHelper(id)
+}
 
 // Load settings on mount
 onMounted(() => {
@@ -577,7 +586,7 @@ function onProviderChange() {
  * Display an alert if API key or required fields are missing
  */
 function checkProviderConfiguration() {
-  const provider = settings.value.provider
+  const provider = presetsSettings.value.provider
 
   // Reset all validation messages first
   Object.keys(validationMessage.value).forEach((key) => {
@@ -647,44 +656,6 @@ function checkProviderConfiguration() {
       }
       break
   }
-}
-
-function handleShortcutInput(event: KeyboardEvent) {
-  if (event.key === 'Backspace' || event.key === 'Delete') {
-    return
-  }
-
-  event.preventDefault()
-
-  const parts: string[] = []
-  if (event.ctrlKey) parts.push('Ctrl')
-  if (event.altKey) parts.push('Alt')
-  if (event.shiftKey) parts.push('Shift')
-  if (event.metaKey) parts.push('Meta')
-
-  const key = event.key
-  if (!['Control', 'Alt', 'Shift', 'Meta'].includes(key)) {
-    parts.push(key.toUpperCase())
-  }
-
-  if (parts.length > 1) {
-    settings.value.keyboardShortcut = parts.join('+')
-    validateAndSaveShortcut()
-  }
-}
-
-function validateAndSaveShortcut() {
-  const shortcut = settings.value.keyboardShortcut.trim()
-
-  const validPattern = /^(Ctrl|Alt|Shift|Meta)(\+(Ctrl|Alt|Shift|Meta))*\+[A-Z0-9]$/i
-
-  if (!validPattern.test(shortcut)) {
-    shortcutError.value = 'Invalid shortcut format. Use modifiers + key (e.g., Alt+T)'
-    return
-  }
-
-  shortcutError.value = ''
-  // Settings are automatically saved by useStorageState
 }
 </script>
 

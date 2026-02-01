@@ -65,3 +65,24 @@ export interface ProviderKeys {
     model: string
   }
 }
+
+/**
+ * Translation preset (triplet: sourceLang + targetLang + keyboardShortcut)
+ */
+export interface TranslationPreset {
+  id: string
+  name: string
+  sourceLang: string
+  targetLang: string
+  keyboardShortcut: string
+  createdAt: number
+}
+
+/**
+ * Presets settings structure
+ */
+export interface PresetsSettings {
+  presets: TranslationPreset[]
+  activePresetId: string | null
+  provider: TranslationProvider
+}

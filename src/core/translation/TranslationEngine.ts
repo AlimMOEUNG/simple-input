@@ -122,8 +122,11 @@ export class TranslationEngine {
 
   /**
    * Translate text using the configured provider
+   * @param text Text to translate
+   * @param sourceLang Optional source language (overrides settings)
+   * @param targetLang Optional target language (overrides settings)
    */
-  async translateText(text: string, targetLang?: string): Promise<string> {
+  async translateText(text: string, sourceLang?: string, targetLang?: string): Promise<string> {
     // Ensure provider is initialized
     if (!this.currentProvider) {
       await this.reinitializeProvider()
@@ -133,17 +136,18 @@ export class TranslationEngine {
       throw new Error('No translation provider available')
     }
 
-    const sourceLang = this.settings.get('sourceLang')
-    const target = targetLang || this.settings.get('targetLang')
+    // Use provided languages or fall back to settings
+    const source = sourceLang !== undefined ? sourceLang : this.settings.get('sourceLang')
+    const target = targetLang !== undefined ? targetLang : this.settings.get('targetLang')
 
     console.log(
-      `[TranslationEngine] Translating with ${this.currentProvider.name}: "${text.substring(0, 50)}..."`
+      `[TranslationEngine] Translating with ${this.currentProvider.name}: "${text.substring(0, 50)}..." (${source} → ${target})`
     )
 
     try {
       const translated = await this.currentProvider.translateText(text, {
         targetLanguage: target,
-        sourceLanguage: sourceLang === 'auto' ? undefined : sourceLang,
+        sourceLanguage: source === 'auto' ? undefined : source,
       })
 
       console.log(`[TranslationEngine] Translation successful`)

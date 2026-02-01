@@ -1,31 +1,33 @@
 /**
  * KeyboardShortcutHandler - Handles keyboard shortcuts for translation
  *
- * Provides keyboard shortcut (Alt+T by default) for translating text:
+ * Supports multiple presets, each with its own:
+ * - Source language
+ * - Target language
+ * - Keyboard shortcut
+ *
+ * Translation behavior:
  * - If selection exists → translate selection
  * - If focus on input → translate entire input content
  * - Otherwise → do nothing
  *
- * Shortcut is customizable via settings (stored in chrome.storage.sync)
+ * Shortcuts are customizable via presets settings (stored in chrome.storage.sync)
  */
 
 import { TranslationEngine } from '../translation/TranslationEngine'
 import { SettingsManager } from '../storage/SettingsManager'
 import { InputHandler } from './input/InputHandler'
-
-/**
- * Shortcut configuration object
- */
-interface ShortcutConfig {
-  ctrl?: boolean
-  alt?: boolean
-  shift?: boolean
-  meta?: boolean
-  key: string
-}
+import {
+  formatShortcutFromEvent,
+  normalizeShortcut,
+  KeyboardSequenceDetector,
+} from '../utils/keyboardUtils'
+import type { TranslationPreset } from '@/types/common'
 
 export class KeyboardShortcutHandler {
   private isProcessing = false // Prevent concurrent translations
+  private shortcutMap = new Map<string, TranslationPreset>() // Shortcut → Preset mapping
+  private sequenceDetector = new KeyboardSequenceDetector() // Sequence detector for multi-key shortcuts
 
   constructor(
     private engine: TranslationEngine,
@@ -36,8 +38,10 @@ export class KeyboardShortcutHandler {
    * Initialize the handler by setting up keyboard event listener
    */
   initialize(): void {
+    this.rebuildShortcutMap()
     document.addEventListener('keydown', this.handleKeyDown.bind(this))
-    console.log('[KeyboardShortcut] Handler initialized')
+    document.addEventListener('keyup', this.handleKeyUp.bind(this))
+    console.log('[KeyboardShortcut] Handler initialized with presets:', this.shortcutMap.size)
   }
 
   /**
@@ -45,21 +49,47 @@ export class KeyboardShortcutHandler {
    */
   destroy(): void {
     document.removeEventListener('keydown', this.handleKeyDown.bind(this))
+    document.removeEventListener('keyup', this.handleKeyUp.bind(this))
+    this.shortcutMap.clear()
     console.log('[KeyboardShortcut] Handler destroyed')
   }
 
   /**
-   * Handle keydown events and detect configured shortcut
+   * Rebuild shortcut map from all presets
+   * Called on init and when presets change
+   */
+  rebuildShortcutMap(): void {
+    this.shortcutMap.clear()
+    const presets = this.settings.getPresets()
+
+    for (const preset of presets) {
+      const normalized = normalizeShortcut(preset.keyboardShortcut)
+      this.shortcutMap.set(normalized, preset)
+      console.log(
+        `[KeyboardShortcut] Registered: ${preset.keyboardShortcut} → ${preset.name} (${preset.sourceLang} → ${preset.targetLang})`
+      )
+    }
+  }
+
+  /**
+   * Handle keydown events and detect configured shortcuts
+   * Supports both simple shortcuts and multi-key sequences
    */
   private async handleKeyDown(event: KeyboardEvent): Promise<void> {
-    // Get configured shortcut from settings (default: "Alt+T")
-    const shortcut = this.settings.get('keyboardShortcut') || 'Alt+T'
+    // Process the key event through sequence detector
+    const sequenceShortcut = this.sequenceDetector.processKeyDown(event)
 
-    // Parse shortcut string (e.g., "Alt+T" → { alt: true, key: 't' })
-    const shortcutConfig = this.parseShortcut(shortcut)
+    // Try both simple shortcut and sequence shortcut
+    const simpleShortcut = formatShortcutFromEvent(event)
 
-    // Check if current event matches configured shortcut
-    if (!this.matchesShortcut(event, shortcutConfig)) {
+    // Check if either format matches a preset
+    let preset = this.shortcutMap.get(simpleShortcut)
+    if (!preset && sequenceShortcut) {
+      preset = this.shortcutMap.get(sequenceShortcut)
+    }
+
+    // No matching preset found
+    if (!preset) {
       return
     }
 
@@ -73,49 +103,32 @@ export class KeyboardShortcutHandler {
       return
     }
 
+    console.log(
+      `[KeyboardShortcut] Shortcut triggered: ${preset.name} (${preset.keyboardShortcut})`
+    )
+
     try {
       this.isProcessing = true
-      await this.handleShortcut()
+      await this.handleShortcut(preset)
     } finally {
       this.isProcessing = false
+      // Reset sequence after successful shortcut
+      this.sequenceDetector.reset()
     }
   }
 
   /**
-   * Parse shortcut string into configuration object
-   * Examples: "Alt+T" → { alt: true, key: 't' }
-   *           "Ctrl+Shift+T" → { ctrl: true, shift: true, key: 't' }
+   * Handle keyup events to reset sequence detector
    */
-  private parseShortcut(shortcut: string): ShortcutConfig {
-    const parts = shortcut.split('+').map((p) => p.trim().toLowerCase())
-    const key = parts[parts.length - 1] // Last part is the key
-
-    return {
-      ctrl: parts.includes('ctrl') || parts.includes('control'),
-      alt: parts.includes('alt'),
-      shift: parts.includes('shift'),
-      meta: parts.includes('meta') || parts.includes('cmd'),
-      key: key,
-    }
-  }
-
-  /**
-   * Check if keyboard event matches shortcut configuration
-   */
-  private matchesShortcut(event: KeyboardEvent, config: ShortcutConfig): boolean {
-    return (
-      event.key.toLowerCase() === config.key &&
-      event.ctrlKey === (config.ctrl || false) &&
-      event.altKey === (config.alt || false) &&
-      event.shiftKey === (config.shift || false) &&
-      event.metaKey === (config.meta || false)
-    )
+  private handleKeyUp(event: KeyboardEvent): void {
+    this.sequenceDetector.processKeyUp(event)
   }
 
   /**
    * Main shortcut logic: detect context and translate
+   * Uses preset's source and target languages
    */
-  private async handleShortcut(): Promise<void> {
+  private async handleShortcut(preset: TranslationPreset): Promise<void> {
     // Get focused input if any
     const focusedInput = InputHandler.getFocusedInput()
 
@@ -124,7 +137,7 @@ export class KeyboardShortcutHandler {
       const selection = InputHandler.getSelectedText(focusedInput)
       if (selection && selection.trim().length > 0) {
         console.log(`[KeyboardShortcut] Translating input selection (${selection.length} chars)`)
-        await this.translateInputSelection(focusedInput, selection)
+        await this.translateInputSelection(focusedInput, selection, preset)
         return
       }
     }
@@ -134,7 +147,7 @@ export class KeyboardShortcutHandler {
       const text = InputHandler.getTextValue(focusedInput)
       if (text && text.trim().length > 0) {
         console.log(`[KeyboardShortcut] Translating input content (${text.length} chars)`)
-        await this.translateInputContent(focusedInput, text)
+        await this.translateInputContent(focusedInput, text, preset)
         return
       }
     }
@@ -143,7 +156,7 @@ export class KeyboardShortcutHandler {
     const pageSelection = window.getSelection()?.toString()
     if (pageSelection && pageSelection.trim().length > 0) {
       console.log(`[KeyboardShortcut] Translating page selection (${pageSelection.length} chars)`)
-      await this.translatePageSelection(pageSelection)
+      await this.translatePageSelection(pageSelection, preset)
       return
     }
 
@@ -153,15 +166,23 @@ export class KeyboardShortcutHandler {
 
   /**
    * Translate selection within an input field
+   * Uses preset's source and target languages
    */
   private async translateInputSelection(
     inputElement: HTMLElement,
-    selectedText: string
+    selectedText: string,
+    preset: TranslationPreset
   ): Promise<void> {
     try {
-      // Translate the text
-      const translatedText = await this.engine.translateText(selectedText)
-      console.log('[KeyboardShortcut] Input selection translated')
+      // Translate the text using preset languages
+      const translatedText = await this.engine.translateText(
+        selectedText,
+        preset.sourceLang,
+        preset.targetLang
+      )
+      console.log(
+        `[KeyboardShortcut] Input selection translated (${preset.sourceLang} → ${preset.targetLang})`
+      )
 
       // Replace selection in input
       const success = InputHandler.replaceSelectedText(inputElement, translatedText)
@@ -176,15 +197,23 @@ export class KeyboardShortcutHandler {
 
   /**
    * Translate entire input content
+   * Uses preset's source and target languages
    */
   private async translateInputContent(
     inputElement: HTMLElement,
-    originalText: string
+    originalText: string,
+    preset: TranslationPreset
   ): Promise<void> {
     try {
-      // Translate the text
-      const translatedText = await this.engine.translateText(originalText)
-      console.log('[KeyboardShortcut] Input content translated')
+      // Translate the text using preset languages
+      const translatedText = await this.engine.translateText(
+        originalText,
+        preset.sourceLang,
+        preset.targetLang
+      )
+      console.log(
+        `[KeyboardShortcut] Input content translated (${preset.sourceLang} → ${preset.targetLang})`
+      )
 
       // Replace entire input content
       const success = InputHandler.setTextValue(inputElement, translatedText)
@@ -202,12 +231,22 @@ export class KeyboardShortcutHandler {
 
   /**
    * Translate page selection (text selected outside of input fields)
+   * Uses preset's source and target languages
    */
-  private async translatePageSelection(selectedText: string): Promise<void> {
+  private async translatePageSelection(
+    selectedText: string,
+    preset: TranslationPreset
+  ): Promise<void> {
     try {
-      // Translate the text
-      const translatedText = await this.engine.translateText(selectedText)
-      console.log('[KeyboardShortcut] Page selection translated')
+      // Translate the text using preset languages
+      const translatedText = await this.engine.translateText(
+        selectedText,
+        preset.sourceLang,
+        preset.targetLang
+      )
+      console.log(
+        `[KeyboardShortcut] Page selection translated (${preset.sourceLang} → ${preset.targetLang})`
+      )
 
       // Replace selection using DOM manipulation
       const selection = window.getSelection()

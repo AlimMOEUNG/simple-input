@@ -292,12 +292,28 @@ export function usePresetsSettings() {
 
   /**
    * Get the active preset
+   * Returns the first preset if activePresetId is null or doesn't exist
    */
   function getActivePreset(): TranslationPreset | undefined {
     if (!presetsSettings.value.activePresetId) {
       return presetsSettings.value.presets[0]
     }
-    return getPresetById(presetsSettings.value.activePresetId)
+
+    const preset = getPresetById(presetsSettings.value.activePresetId)
+
+    // If the active preset doesn't exist (deleted or invalid), fall back to first preset
+    if (!preset) {
+      console.warn(
+        `[usePresetsSettings] Active preset ${presetsSettings.value.activePresetId} not found, falling back to first preset`
+      )
+      // Update activePresetId to the first preset
+      if (presetsSettings.value.presets.length > 0) {
+        presetsSettings.value.activePresetId = presetsSettings.value.presets[0].id
+        return presetsSettings.value.presets[0]
+      }
+    }
+
+    return preset
   }
 
   /**

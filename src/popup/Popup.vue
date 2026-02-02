@@ -493,6 +493,7 @@ import { useI18nWrapper } from '@/composables/useI18nWrapper'
 import { useThemeMode } from '@/composables/useThemeMode'
 import { useSettings } from '@/composables/useSettings'
 import { usePresetsSettings } from '@/composables/usePresetsSettings'
+import { usePopupState } from '@/composables/usePopupState'
 import { PREDEFINED_MODELS, isCustomModel, getEffectiveModel } from '@/config/predefinedModels'
 import type { SupportedLocale } from '@/core/utils/i18n'
 import type { TranslationPreset } from '@/types/common'
@@ -520,8 +521,8 @@ const {
 // Provider configs (still uses old useSettings for provider keys)
 const { providerConfigs } = useSettings()
 
-// Current view state
-const currentView = ref<'presets' | 'provider'>('presets')
+// Popup state (persisted to storage)
+const { currentView } = usePopupState()
 
 // Language selector
 const availableLanguages = [

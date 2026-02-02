@@ -1,8 +1,10 @@
 <template>
-  <div class="preset-editor space-y-2">
+  <div class="preset-editor space-y-1.5">
     <!-- Preset Name -->
     <div class="relative">
-      <label class="block text-xs font-medium mb-1">{{ t('presetName') }}</label>
+      <label class="block text-[10px] font-semibold mb-0.5 text-gray-700 dark:text-gray-300">
+        {{ t('presetName') }}
+      </label>
       <div class="flex gap-1 items-center">
         <input
           v-model="localPreset.name"
@@ -23,7 +25,9 @@
 
     <!-- Source Language -->
     <div>
-      <label class="block text-xs font-medium mb-1">{{ t('sourceLanguage') }}</label>
+      <label class="block text-[10px] font-semibold mb-0.5 text-gray-700 dark:text-gray-300">
+        {{ t('sourceLanguage') }}
+      </label>
       <select
         v-model="localPreset.sourceLang"
         class="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -46,7 +50,9 @@
 
     <!-- Target Language -->
     <div>
-      <label class="block text-xs font-medium mb-1">{{ t('targetLanguage') }}</label>
+      <label class="block text-[10px] font-semibold mb-0.5 text-gray-700 dark:text-gray-300">
+        {{ t('targetLanguage') }}
+      </label>
       <select
         v-model="localPreset.targetLang"
         class="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -68,7 +74,9 @@
 
     <!-- Keyboard Shortcut -->
     <div>
-      <label class="block text-xs font-medium mb-1">{{ t('keyboardShortcut') }}</label>
+      <label class="block text-[10px] font-semibold mb-0.5 text-gray-700 dark:text-gray-300">
+        {{ t('keyboardShortcut') }}
+      </label>
       <input
         v-model="localPreset.keyboardShortcut"
         @keydown="handleShortcutInput"
@@ -103,11 +111,23 @@
     <!-- Delete Button -->
     <button
       v-if="canDelete"
-      @click="confirmDelete"
+      @click="showDeleteDialog = true"
       class="w-full px-2 py-1.5 text-xs rounded bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900 transition-colors"
     >
       {{ t('deletePreset') }}
     </button>
+
+    <!-- Delete Confirmation Dialog -->
+    <ConfirmDialog
+      :show="showDeleteDialog"
+      :title="t('presetDeleteTitle')"
+      :message="t('presetDeleteMessage', { params: { name: localPreset.name } })"
+      :confirm-text="t('deletePreset')"
+      :cancel-text="t('cancel')"
+      variant="danger"
+      @confirm="handleDeleteConfirm"
+      @cancel="showDeleteDialog = false"
+    />
   </div>
 </template>
 
@@ -121,6 +141,7 @@ import {
   KeyboardSequenceDetector,
 } from '@/core/utils/keyboardUtils'
 import type { TranslationPreset } from '@/types/common'
+import ConfirmDialog from './ConfirmDialog.vue'
 
 const { t } = useI18nWrapper()
 
@@ -143,6 +164,7 @@ const emit = defineEmits<{
 // Local copy of preset for editing
 const localPreset = ref<TranslationPreset>({ ...props.preset })
 const shortcutError = ref('')
+const showDeleteDialog = ref(false)
 
 // Detect unsaved changes
 const hasUnsavedChanges = computed(() => {
@@ -280,12 +302,14 @@ function savePreset() {
 }
 
 /**
- * Confirm deletion before emitting delete event
+ * Handle delete confirmation from dialog
  */
-function confirmDelete() {
-  if (confirm(t('presetDeleteConfirm', { params: { name: localPreset.value.name } }))) {
-    emit('delete-preset', props.preset.id)
-  }
+function handleDeleteConfirm() {
+  // Close dialog
+  showDeleteDialog.value = false
+
+  // Emit delete event
+  emit('delete-preset', props.preset.id)
 }
 </script>
 

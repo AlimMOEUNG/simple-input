@@ -207,14 +207,29 @@ watch(
   { deep: true }
 )
 
+// Maximum number of presets allowed
+const MAX_PRESETS = 10
+
 /**
  * Composable to manage translation presets
  */
 export function usePresetsSettings() {
   /**
+   * Check if maximum presets limit is reached
+   */
+  function canAddPreset(): boolean {
+    return presetsSettings.value.presets.length < MAX_PRESETS
+  }
+
+  /**
    * Add a new preset with default values
    */
-  function addPreset(): TranslationPreset {
+  function addPreset(): TranslationPreset | null {
+    if (!canAddPreset()) {
+      console.warn('[usePresetsSettings] Maximum presets limit reached')
+      return null
+    }
+
     const newIndex = presetsSettings.value.presets.length + 1
     const newPreset = createDefaultPreset(newIndex)
 
@@ -335,5 +350,7 @@ export function usePresetsSettings() {
     setActivePreset,
     validateShortcutUniqueness,
     generateDefaultShortcut,
+    canAddPreset,
+    maxPresets: MAX_PRESETS,
   }
 }

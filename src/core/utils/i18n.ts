@@ -71,6 +71,8 @@ const enTranslations = {
   presetNamePlaceholder: 'My Preset',
   addPreset: 'Add Preset',
   deletePreset: 'Delete Preset',
+  presetDeleteTitle: 'Delete Preset?',
+  presetDeleteMessage: 'Are you sure you want to delete "{name}"? This action cannot be undone.',
   presetDeleteConfirm: 'Are you sure you want to delete "{name}"?',
   shortcutInvalidFormat: 'Invalid shortcut format. Must have a modifier (e.g., Alt+T, Alt, Ctrl+1)',
   shortcutDuplicate: 'Shortcut already used by "{name}"',
@@ -79,6 +81,7 @@ const enTranslations = {
   cannotDeleteLastPreset: 'Cannot delete the last preset',
   saveChanges: 'Save',
   unsavedChanges: 'Unsaved changes',
+  cancel: 'Cancel',
 
   // Usage
   howToUse: 'How to use:',
@@ -135,6 +138,8 @@ const frTranslations: TranslationMap = {
   presetNamePlaceholder: 'Ma triplette',
   addPreset: 'Ajouter une triplette',
   deletePreset: 'Supprimer la triplette',
+  presetDeleteTitle: 'Delete Preset?',
+  presetDeleteMessage: 'Are you sure you want to delete "{name}"? This action cannot be undone.',
   presetDeleteConfirm: 'Êtes-vous sûr de vouloir supprimer "{name}" ?',
   shortcutInvalidFormat:
     'Format de raccourci invalide. Doit avoir un modificateur (ex: Alt+T, Alt, Ctrl+1)',
@@ -146,6 +151,7 @@ const frTranslations: TranslationMap = {
   cannotDeleteLastPreset: 'Impossible de supprimer la dernière triplette',
   saveChanges: 'Enregistrer',
   unsavedChanges: 'Modifications non enregistrées',
+  cancel: 'Cancel',
   howToUse: 'Comment utiliser :',
   usageSelect: 'Sélectionnez du texte et appuyez sur {shortcut} pour le traduire',
   usageInput:
@@ -195,6 +201,8 @@ const esTranslations: TranslationMap = {
   presetNamePlaceholder: 'Mi preset',
   addPreset: 'Agregar preset',
   deletePreset: 'Eliminar preset',
+  presetDeleteTitle: 'Delete Preset?',
+  presetDeleteMessage: 'Are you sure you want to delete "{name}"? This action cannot be undone.',
   presetDeleteConfirm: '¿Está seguro de que desea eliminar "{name}"?',
   shortcutInvalidFormat:
     'Formato de atajo inválido. Debe tener un modificador (ej: Alt+T, Alt, Ctrl+1)',
@@ -206,6 +214,7 @@ const esTranslations: TranslationMap = {
   cannotDeleteLastPreset: 'No se puede eliminar el último preset',
   saveChanges: 'Guardar',
   unsavedChanges: 'Cambios no guardados',
+  cancel: 'Cancel',
   howToUse: 'Cómo usar:',
   usageSelect: 'Seleccione texto y presione {shortcut} para traducirlo',
   usageInput: 'Enfóquese en un campo de entrada y presione {shortcut} para traducir el contenido',
@@ -254,6 +263,8 @@ const deTranslations: TranslationMap = {
   presetNamePlaceholder: 'Meine Voreinstellung',
   addPreset: 'Voreinstellung hinzufügen',
   deletePreset: 'Voreinstellung löschen',
+  presetDeleteTitle: 'Delete Preset?',
+  presetDeleteMessage: 'Are you sure you want to delete "{name}"? This action cannot be undone.',
   presetDeleteConfirm: 'Möchten Sie "{name}" wirklich löschen?',
   shortcutInvalidFormat:
     'Ungültiges Tastenkombinationsformat. Muss einen Modifikator haben (z.B. Alt+T, Alt, Ctrl+1)',
@@ -265,6 +276,7 @@ const deTranslations: TranslationMap = {
   cannotDeleteLastPreset: 'Die letzte Voreinstellung kann nicht gelöscht werden',
   saveChanges: 'Speichern',
   unsavedChanges: 'Nicht gespeicherte Änderungen',
+  cancel: 'Cancel',
   howToUse: 'Verwendung:',
   usageSelect: 'Wählen Sie Text aus und drücken Sie {shortcut}, um ihn zu übersetzen',
   usageInput:
@@ -312,6 +324,8 @@ const zhTranslations: TranslationMap = {
   presetNamePlaceholder: '我的预设',
   addPreset: '添加预设',
   deletePreset: '删除预设',
+  presetDeleteTitle: 'Delete Preset?',
+  presetDeleteMessage: 'Are you sure you want to delete "{name}"? This action cannot be undone.',
   presetDeleteConfirm: '确定要删除 "{name}" 吗？',
   shortcutInvalidFormat: '快捷键格式无效。必须包含修饰键（例如：Alt+T, Alt, Ctrl+1）',
   shortcutDuplicate: '快捷键已被 "{name}" 使用',
@@ -320,6 +334,7 @@ const zhTranslations: TranslationMap = {
   cannotDeleteLastPreset: '无法删除最后一个预设',
   saveChanges: '保存',
   unsavedChanges: '未保存的更改',
+  cancel: 'Cancel',
   howToUse: '如何使用：',
   usageSelect: '选择文本并按 {shortcut} 翻译',
   usageInput: '聚焦输入字段并按 {shortcut} 翻译内容',
@@ -367,6 +382,8 @@ const jaTranslations: TranslationMap = {
   presetNamePlaceholder: 'マイプリセット',
   addPreset: 'プリセットを追加',
   deletePreset: 'プリセットを削除',
+  presetDeleteTitle: 'Delete Preset?',
+  presetDeleteMessage: 'Are you sure you want to delete "{name}"? This action cannot be undone.',
   presetDeleteConfirm: '"{name}" を削除してもよろしいですか？',
   shortcutInvalidFormat:
     'ショートカット形式が無効です。修飾キーが必要です（例：Alt+T, Alt, Ctrl+1）',
@@ -378,6 +395,7 @@ const jaTranslations: TranslationMap = {
   cannotDeleteLastPreset: '最後のプリセットは削除できません',
   saveChanges: '保存',
   unsavedChanges: '未保存の変更',
+  cancel: 'Cancel',
   howToUse: '使い方：',
   usageSelect: 'テキストを選択して {shortcut} を押して翻訳',
   usageInput: '入力フィールドにフォーカスして {shortcut} を押してコンテンツを翻訳',

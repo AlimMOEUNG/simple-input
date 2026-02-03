@@ -36,24 +36,12 @@
       <label class="block text-[10px] font-semibold mb-0.5 text-gray-700 dark:text-gray-300">
         {{ t('sourceLanguage') }}
       </label>
-      <select
+      <LanguageSelector
         v-model="localPreset.sourceLang"
-        class="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-      >
-        <option value="auto">{{ t('autoDetect') }}</option>
-        <option value="en">English</option>
-        <option value="fr">French</option>
-        <option value="es">Spanish</option>
-        <option value="de">German</option>
-        <option value="it">Italian</option>
-        <option value="pt">Portuguese</option>
-        <option value="nl">Dutch</option>
-        <option value="pl">Polish</option>
-        <option value="ru">Russian</option>
-        <option value="zh">Chinese</option>
-        <option value="ja">Japanese</option>
-        <option value="ko">Korean</option>
-      </select>
+        :placeholder="t('searchLanguagePlaceholder')"
+        input-id="source-language-selector"
+        include-auto-detect
+      />
     </div>
 
     <!-- Target Language -->
@@ -61,23 +49,11 @@
       <label class="block text-[10px] font-semibold mb-0.5 text-gray-700 dark:text-gray-300">
         {{ t('targetLanguage') }}
       </label>
-      <select
+      <LanguageSelector
         v-model="localPreset.targetLang"
-        class="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-      >
-        <option value="en">English</option>
-        <option value="fr">French</option>
-        <option value="es">Spanish</option>
-        <option value="de">German</option>
-        <option value="it">Italian</option>
-        <option value="pt">Portuguese</option>
-        <option value="nl">Dutch</option>
-        <option value="pl">Polish</option>
-        <option value="ru">Russian</option>
-        <option value="zh">Chinese</option>
-        <option value="ja">Japanese</option>
-        <option value="ko">Korean</option>
-      </select>
+        :placeholder="t('searchLanguagePlaceholder')"
+        input-id="target-language-selector"
+      />
     </div>
 
     <!-- Keyboard Shortcut -->
@@ -158,6 +134,7 @@ import {
 } from '@/core/utils/keyboardUtils'
 import type { TranslationPreset } from '@/types/common'
 import ConfirmDialog from './ConfirmDialog.vue'
+import LanguageSelector from './LanguageSelector.vue'
 
 const { t } = useI18nWrapper()
 

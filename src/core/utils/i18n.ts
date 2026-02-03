@@ -1,6 +1,7 @@
 import { ref } from 'vue'
 
 export type SupportedLocale = 'en' | 'fr' | 'es' | 'de' | 'zh' | 'ja'
+export type Locale = SupportedLocale // Alias for compatibility
 
 export const supportedLocales: Array<{ value: SupportedLocale; label: string }> = [
   { value: 'en', label: 'English' },
@@ -62,6 +63,7 @@ const enTranslations = {
   sourceLanguageDescription: 'Select "Auto-detect" to let the provider detect the source language',
   targetLanguage: 'Target Language',
   autoDetect: 'Auto-detect',
+  searchLanguagePlaceholder: 'Search language...',
 
   // Keyboard Shortcut
   keyboardShortcut: 'Keyboard Shortcut',
@@ -134,6 +136,7 @@ const frTranslations: TranslationMap = {
     'Sélectionner "Détection auto" pour laisser le fournisseur détecter la langue source',
   targetLanguage: 'Langue cible',
   autoDetect: 'Détection auto',
+  searchLanguagePlaceholder: 'Rechercher une langue...',
   keyboardShortcut: 'Raccourci clavier',
   keyboardShortcutDescription:
     'Appuyez sur la combinaison de touches souhaitée (ex: Alt+T, Ctrl+Shift+T)',
@@ -199,6 +202,7 @@ const esTranslations: TranslationMap = {
     'Seleccione "Detección automática" para que el proveedor detecte el idioma de origen',
   targetLanguage: 'Idioma de destino',
   autoDetect: 'Detección automática',
+  searchLanguagePlaceholder: 'Buscar idioma...',
   keyboardShortcut: 'Atajo de teclado',
   keyboardShortcutDescription:
     'Presione la combinación de teclas deseada (ej: Alt+T, Ctrl+Shift+T)',
@@ -263,6 +267,7 @@ const deTranslations: TranslationMap = {
     'Wählen Sie "Automatische Erkennung", damit der Anbieter die Quellsprache erkennt',
   targetLanguage: 'Zielsprache',
   autoDetect: 'Automatische Erkennung',
+  searchLanguagePlaceholder: 'Sprache suchen...',
   keyboardShortcut: 'Tastenkombination',
   keyboardShortcutDescription:
     'Drücken Sie die gewünschte Tastenkombination (z.B. Alt+T, Ctrl+Shift+T)',
@@ -327,6 +332,7 @@ const zhTranslations: TranslationMap = {
   sourceLanguageDescription: '选择"自动检测"让提供商检测源语言',
   targetLanguage: '目标语言',
   autoDetect: '自动检测',
+  searchLanguagePlaceholder: '搜索语言...',
   keyboardShortcut: '键盘快捷键',
   keyboardShortcutDescription: '按下所需的键盘组合（例如：Alt+T, Ctrl+Shift+T）',
   presetName: '预设名称',
@@ -386,6 +392,7 @@ const jaTranslations: TranslationMap = {
   sourceLanguageDescription: 'プロバイダーにソース言語を検出させるには「自動検出」を選択',
   targetLanguage: 'ターゲット言語',
   autoDetect: '自動検出',
+  searchLanguagePlaceholder: '言語を検索...',
   keyboardShortcut: 'キーボードショートカット',
   keyboardShortcutDescription:
     '希望のキーボード組み合わせを押してください（例：Alt+T, Ctrl+Shift+T）',
@@ -505,4 +512,27 @@ export function setLocale(locale: SupportedLocale): void {
     return
   }
   activeLocale.value = locale
+}
+
+/**
+ * Get localized name for a language code using Intl.DisplayNames API
+ * @param code - ISO 639-1 language code (e.g., 'fr', 'en', 'ja')
+ * @param displayLocale - UI locale to display the name in (optional, uses activeLocale by default)
+ * @returns Localized language name, or uppercase code if API fails
+ *
+ * Examples:
+ * getLanguageDisplayName('fr', 'en') // "French"
+ * getLanguageDisplayName('ja', 'fr') // "japonais"
+ * getLanguageDisplayName('es') // "Spanish" (if UI is in English)
+ */
+export function getLanguageDisplayName(code: string, displayLocale?: SupportedLocale): string {
+  try {
+    const locale = displayLocale || activeLocale.value
+    const displayNames = new Intl.DisplayNames([locale], { type: 'language' })
+    const name = displayNames.of(code)
+    return name || code.toUpperCase()
+  } catch (error) {
+    // Fallback in case of API failure
+    return code.toUpperCase()
+  }
 }

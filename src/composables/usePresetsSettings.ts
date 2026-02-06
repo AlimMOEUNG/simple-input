@@ -24,9 +24,22 @@ function generateUUID(): string {
 
 /**
  * Generate default keyboard shortcut for a preset index
+ * First preset gets Alt+T (intuitive for "Translate")
+ * Following presets get Alt+2, Alt+3, Alt+4, etc. (avoids conflicts)
+ *
+ * Examples:
+ * - Preset 1 → Alt+T
+ * - Preset 2 → Alt+2
+ * - Preset 3 → Alt+3
+ * - Preset 4 → Alt+4
  */
 function generateDefaultShortcut(index: number): string {
-  return index === 1 ? 'Alt+T' : `Alt+${index}+T`
+  if (index === 1) {
+    return 'Alt+T'
+  }
+  // For index 2 and above, use Alt+2, Alt+3, Alt+4, etc.
+  // This matches the preset number and avoids prefix conflicts
+  return `Alt+${index}`
 }
 
 /**

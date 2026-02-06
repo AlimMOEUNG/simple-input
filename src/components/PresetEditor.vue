@@ -326,7 +326,7 @@
           v-model="localPreset.keyboardShortcut"
           @keydown="handleShortcutInput"
           @keyup="handleShortcutKeyUp"
-          placeholder="Alt+T, Alt+T+1, or Alt"
+          placeholder="Alt+T, Alt+2, Alt+T+1"
           class="flex-1 px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono"
         />
         <div class="relative group">
@@ -800,6 +800,7 @@ function handleShortcutKeyUp(event: KeyboardEvent) {
 
 /**
  * Format check + uniqueness check for the shortcut string.
+ * Also checks for prefix conflicts (e.g., Alt+T vs Alt+T+1).
  */
 function validateShortcut(): boolean {
   const shortcut = localPreset.value.keyboardShortcut.trim()
@@ -819,6 +820,12 @@ function validateShortcut(): boolean {
   const modifiers = ['ctrl', 'alt', 'shift', 'meta', 'control', 'cmd', 'command', 'super']
   const keys = tokens.filter((token) => !modifiers.includes(token.toLowerCase()))
 
+  // REJECT modifier-only shortcuts (Alt, Ctrl, Shift, Meta alone)
+  if (keys.length === 0) {
+    shortcutError.value = t('shortcutModifierOnly') || 'Modifier-only shortcuts (Alt, Ctrl, etc.) are not allowed'
+    return false
+  }
+
   if (keys.length > 2) {
     shortcutError.value = t('shortcutTooManyKeys')
     return false
@@ -830,6 +837,7 @@ function validateShortcut(): boolean {
     return false
   }
 
+  // Check for exact duplicates
   const duplicate = props.allPresets.find(
     (p) => p.id !== props.preset.id && normalizeShortcut(p.keyboardShortcut) === normalizedShortcut
   )
@@ -837,6 +845,36 @@ function validateShortcut(): boolean {
   if (duplicate) {
     shortcutError.value = t('shortcutDuplicate', { params: { name: duplicate.name } })
     return false
+  }
+
+  // Check for prefix conflicts
+  // A conflict exists if:
+  // - New shortcut is a prefix of an existing one (e.g., Alt+T vs existing Alt+T+1)
+  // - An existing shortcut is a prefix of the new one (e.g., existing Alt+T vs new Alt+T+1)
+  for (const preset of props.allPresets) {
+    if (preset.id === props.preset.id) continue
+
+    const existingNormalized = normalizeShortcut(preset.keyboardShortcut)
+
+    // Check if new is a prefix of existing (e.g., Alt+T vs Alt+T+1)
+    if (existingNormalized.startsWith(normalizedShortcut + '+')) {
+      shortcutError.value = `Conflict: "${normalizedShortcut}" is a prefix of "${existingNormalized}" (${preset.name})`
+      showValidationError(
+        t('shortcutConflictTitle') || 'Shortcut Conflict',
+        `The shortcut "${normalizedShortcut}" conflicts with "${existingNormalized}" used by "${preset.name}".\n\nWhen you press "${normalizedShortcut}", it will be triggered immediately and you won't be able to use "${existingNormalized}".\n\nPlease remove or modify "${preset.name}" first, or choose a different shortcut.`
+      )
+      return false
+    }
+
+    // Check if existing is a prefix of new (e.g., existing Alt+T vs new Alt+T+1)
+    if (normalizedShortcut.startsWith(existingNormalized + '+')) {
+      shortcutError.value = `Conflict: "${existingNormalized}" (${preset.name}) is a prefix of "${normalizedShortcut}"`
+      showValidationError(
+        t('shortcutConflictTitle') || 'Shortcut Conflict',
+        `The shortcut "${normalizedShortcut}" conflicts with "${existingNormalized}" used by "${preset.name}".\n\nWhen you press "${existingNormalized}", it will be triggered immediately and you won't be able to use "${normalizedShortcut}".\n\nPlease remove or modify "${preset.name}" first, or choose a different shortcut.`
+      )
+      return false
+    }
   }
 
   shortcutError.value = ''

@@ -43,19 +43,21 @@ export function normalizeKeyFromEvent(event: KeyboardEvent): string {
  * Formats as: "Ctrl+Alt+Shift+Meta+Key"
  *
  * Supports:
- * - Modifier only: "Alt", "Ctrl"
  * - Modifier + key: "Alt+T", "Ctrl+1"
  * - Multiple modifiers + key: "Ctrl+Alt+T"
+ * - Modifier + 2 keys: "Alt+T+1"
  *
- * DOES NOT support single key without modifier (e.g., "T" or "1" alone)
+ * DOES NOT support:
+ * - Modifier only: "Alt", "Ctrl" (risk of conflicts with Alt+1, Alt+2, etc.)
+ * - Single key without modifier: "T" or "1" alone
  *
  * @param event - The keyboard event
  * @returns Formatted shortcut string or null if invalid
  *
  * @example
- * buildShortcutFromEvent(event) // "Alt" (just Alt modifier) - VALID
  * buildShortcutFromEvent(event) // "Shift+1" - VALID
  * buildShortcutFromEvent(event) // "Ctrl+Alt+A" - VALID
+ * buildShortcutFromEvent(event) // null (just "Alt" modifier) - INVALID
  * buildShortcutFromEvent(event) // null (just "T" key alone) - INVALID
  */
 export function buildShortcutFromEvent(event: KeyboardEvent): string | null {
@@ -89,12 +91,12 @@ export function buildShortcutFromEvent(event: KeyboardEvent): string | null {
       return null
     }
     shortcut += key
-  } else if (shortcut.endsWith('+')) {
-    // Remove trailing '+' if only modifiers were pressed
-    shortcut = shortcut.slice(0, -1)
+  } else {
+    // REJECT modifier-only shortcuts
+    return null
   }
 
-  // Accept only if has modifier (modifier only OR modifier + key)
+  // Accept only if has both modifier AND key
   if (shortcut && !shortcut.endsWith('+') && hasModifier) {
     return shortcut
   }
@@ -134,11 +136,11 @@ export function formatShortcutFromEvent(event: KeyboardEvent): string {
  * Cleans up and validates shortcut format
  *
  * Supports:
- * - Modifier only: "alt" → "Alt", "ctrl" → "Ctrl"
  * - Modifier + key: "ctrl+a" → "Ctrl+A"
  * - Modifier + 2 keys: "alt+t+1" → "Alt+1+T" (sorted for permutation handling)
  *
  * DOES NOT support:
+ * - Modifier only: "alt", "ctrl" (risk of conflicts with Alt+1, Alt+2, etc.)
  * - Single key without modifier (e.g., "t" or "1" alone)
  * - More than 2 keys after modifiers
  *
@@ -150,12 +152,12 @@ export function formatShortcutFromEvent(event: KeyboardEvent): string {
  * @returns Normalized shortcut string in format "Ctrl+Alt+Shift+Meta+Key1(+Key2)" or empty if invalid
  *
  * @example
- * normalizeShortcut("alt") // "Alt"
  * normalizeShortcut("ctrl+a") // "Ctrl+A"
  * normalizeShortcut("shift + 1") // "Shift+1"
  * normalizeShortcut("alt+t+1") // "Alt+1+T" (sorted)
  * normalizeShortcut("alt+1+t") // "Alt+1+T" (sorted)
  * normalizeShortcut("alt+ctrl+t") // "Alt+Ctrl+T"
+ * normalizeShortcut("alt") // "" (invalid - modifier only)
  * normalizeShortcut("t") // "" (invalid - no modifier)
  * normalizeShortcut("alt+a+b+c") // "" (invalid - too many keys)
  */
@@ -198,6 +200,11 @@ export function normalizeShortcut(shortcut: string): string {
     return ''
   }
 
+  // REJECT if modifier-only (no keys) to prevent conflicts
+  if (modifiers.length > 0 && keys.length === 0) {
+    return ''
+  }
+
   // REJECT if more than 2 keys (too complex)
   if (keys.length > 2) {
     return ''
@@ -222,6 +229,7 @@ export function normalizeShortcut(shortcut: string): string {
  * Supports sequences like "Alt+T+1" (Alt held, then T, then 1)
  * Maximum 2 keys after modifiers
  * Keys are sorted to handle permutations (Alt+T+1 === Alt+1+T)
+ * DOES NOT support modifier-only shortcuts (Alt, Ctrl, etc.)
  */
 export class KeyboardSequenceDetector {
   private sequence: string[] = []
@@ -255,10 +263,7 @@ export class KeyboardSequenceDetector {
     // Get the key (ignore modifier keys themselves)
     const key = normalizeKeyFromEvent(event)
     if (!key) {
-      // If only modifiers are pressed, return modifier-only shortcut
-      if (this.modifiersPressed.length > 0 && this.sequence.length === 0) {
-        return this.modifiersPressed.join('+')
-      }
+      // REJECT modifier-only shortcuts
       return null
     }
 

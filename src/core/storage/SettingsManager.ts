@@ -50,7 +50,7 @@ export class SettingsManager {
         type: 'translation',
         sourceLang: 'auto',
         targetLang: 'en',
-        keyboardShortcut: 'Alt+T',
+        keyboardShortcut: 'Alt+T', // Intuitive default for translation
         createdAt: Date.now(),
       },
     ],

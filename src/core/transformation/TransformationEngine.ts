@@ -146,3 +146,11 @@ export class TransformationEngine {
     }))
   }
 }
+
+/**
+ * Apply a user-defined char-to-char mapping to the input text.
+ * Characters absent from charMap pass through unchanged.
+ */
+export function applyCustomCharMap(text: string, charMap: Record<string, string>): string {
+  return [...text].map((char) => charMap[char] ?? char).join('')
+}

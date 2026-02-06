@@ -15,7 +15,7 @@
  */
 
 import { TranslationEngine } from '../translation/TranslationEngine'
-import { TransformationEngine } from '../transformation/TransformationEngine'
+import { TransformationEngine, applyCustomCharMap } from '../transformation/TransformationEngine'
 import { SettingsManager } from '../storage/SettingsManager'
 import { InputHandler } from './input/InputHandler'
 import {
@@ -23,7 +23,20 @@ import {
   normalizeShortcut,
   KeyboardSequenceDetector,
 } from '../utils/keyboardUtils'
-import type { Preset } from '@/types/common'
+import { getCustomTransformById } from '../../services/customTransformService'
+import { LLMPromptExecutor } from '../llm/LLMPromptExecutor'
+import type { Preset, TranslationProvider } from '@/types/common'
+import { ChromeBuiltInProvider } from '../translation/providers/ChromeBuiltInProvider'
+import { GoogleTranslateProvider } from '../translation/providers/GoogleTranslateProvider'
+import { DeepLProvider } from '../translation/providers/DeepLProvider'
+import { GeminiProvider } from '../translation/providers/GeminiProvider'
+import {
+  OpenAICompatibleProvider,
+  getDefaultEndpoint,
+  type OpenAIProviderType,
+} from '../translation/providers/OpenAICompatibleProvider'
+import type { BaseTranslationProvider } from '../translation/providers/BaseTranslationProvider'
+import { getEffectiveModel } from '@/config/predefinedModels'
 
 export class KeyboardShortcutHandler {
   private isProcessing = false // Prevent concurrent operations
@@ -74,6 +87,14 @@ export class KeyboardShortcutHandler {
       if (preset.type === 'transformation') {
         console.log(
           `[KeyboardShortcut] Registered: ${preset.keyboardShortcut} → ${preset.name} (${preset.transformationStyle})`
+        )
+      } else if (preset.type === 'custom-transform') {
+        console.log(
+          `[KeyboardShortcut] Registered: ${preset.keyboardShortcut} → ${preset.name} (custom-transform: ${preset.customTransformId})`
+        )
+      } else if (preset.type === 'llm-prompt') {
+        console.log(
+          `[KeyboardShortcut] Registered: ${preset.keyboardShortcut} → ${preset.name} (llm-prompt: ${preset.llmProvider}/${preset.llmModel})`
         )
       } else {
         console.log(
@@ -195,12 +216,48 @@ export class KeyboardShortcutHandler {
         console.log(
           `[KeyboardShortcut] Text transformed using ${preset.transformationStyle} (${text.length} → ${resultText.length} chars)`
         )
-      } else {
-        // ASYNCHRONOUS translation
-        resultText = await this.engine.translateText(text, preset.sourceLang, preset.targetLang)
+      } else if (preset.type === 'custom-transform') {
+        // Load charMap from storage and apply char-by-char substitution
+        const transform = await getCustomTransformById(preset.customTransformId)
+        if (!transform) {
+          throw new Error(`Custom transformation "${preset.customTransformId}" not found`)
+        }
+        resultText = applyCustomCharMap(text, transform.charMap)
         console.log(
-          `[KeyboardShortcut] Text translated: ${preset.sourceLang} → ${preset.targetLang} (${text.length} → ${resultText.length} chars)`
+          `[KeyboardShortcut] Text transformed using custom "${transform.name}" (${text.length} → ${resultText.length} chars)`
         )
+      } else if (preset.type === 'llm-prompt') {
+        // Execute prompt template against LLM provider
+        resultText = await LLMPromptExecutor.execute(
+          preset.prompt,
+          text,
+          preset.llmProvider,
+          preset.llmModel
+        )
+        console.log(
+          `[KeyboardShortcut] LLM prompt executed via ${preset.llmProvider}/${preset.llmModel} (${text.length} → ${resultText.length} chars)`
+        )
+      } else {
+        // ASYNCHRONOUS translation - check if custom provider or global
+        if (preset.useCustomProvider && preset.customProvider) {
+          // Use custom provider for this preset
+          const customProvider = await this.createCustomProvider(preset.customProvider, preset)
+          await customProvider.initialize()
+          resultText = await customProvider.translateText(text, {
+            targetLanguage: preset.targetLang,
+            sourceLanguage: preset.sourceLang,
+          })
+          customProvider.destroy()
+          console.log(
+            `[KeyboardShortcut] Text translated using CUSTOM provider ${preset.customProvider}: ${preset.sourceLang} → ${preset.targetLang} (${text.length} → ${resultText.length} chars)`
+          )
+        } else {
+          // Use global provider
+          resultText = await this.engine.translateText(text, preset.sourceLang, preset.targetLang)
+          console.log(
+            `[KeyboardShortcut] Text translated using GLOBAL provider: ${preset.sourceLang} → ${preset.targetLang} (${text.length} → ${resultText.length} chars)`
+          )
+        }
       }
 
       // Apply result based on context
@@ -222,8 +279,164 @@ export class KeyboardShortcutHandler {
       }
     } catch (error) {
       console.error('[KeyboardShortcut] Processing failed:', error)
-      const operation = preset.type === 'transformation' ? 'Transformation' : 'Translation'
+      const operation =
+        preset.type === 'transformation' || preset.type === 'custom-transform'
+          ? 'Transformation'
+          : preset.type === 'llm-prompt'
+            ? 'LLM Prompt'
+            : 'Translation'
       alert(`${operation} failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
+  }
+
+  /**
+   * Create a translation provider instance for a specific provider type
+   * Used when a preset has a custom provider configured
+   * ONLY uses preset-specific configurations (no fallback to global config)
+   */
+  private async createCustomProvider(
+    providerType: TranslationProvider,
+    preset: import('@/types/common').TranslationPreset
+  ): Promise<BaseTranslationProvider> {
+    // Use ONLY preset-specific config (no fallback to global) - DRY approach
+    const config = preset.customProviderConfig || {}
+
+    switch (providerType) {
+      case 'builtin':
+        return new ChromeBuiltInProvider()
+
+      case 'google':
+        return new GoogleTranslateProvider()
+
+      case 'deepl': {
+        const apiKey = config.apiKey
+        if (!apiKey) {
+          throw new Error('DeepL API key is required. Please configure it in the preset settings.')
+        }
+        return new DeepLProvider(apiKey)
+      }
+
+      case 'gemini': {
+        const apiKey = config.apiKey
+        if (!apiKey) {
+          throw new Error('Gemini API key is required. Please configure it in the preset settings.')
+        }
+        const model = getEffectiveModel(config.model || '', config.customModel)
+        if (!model) {
+          throw new Error('Gemini model is required. Please configure it in the preset settings.')
+        }
+        return new GeminiProvider(apiKey, model)
+      }
+
+      case 'chatgpt': {
+        const apiKey = config.apiKey
+        const baseUrl = config.baseUrl || getDefaultEndpoint('chatgpt')
+
+        if (!apiKey) {
+          throw new Error(
+            'ChatGPT API key is required. Please configure it in the preset settings.'
+          )
+        }
+
+        const model = getEffectiveModel(config.model || '', config.customModel)
+        if (!model) {
+          throw new Error('ChatGPT model is required. Please configure it in the preset settings.')
+        }
+
+        return new OpenAICompatibleProvider({
+          providerType: 'chatgpt' as OpenAIProviderType,
+          baseUrl,
+          apiKey,
+          model,
+        })
+      }
+
+      case 'groq': {
+        const apiKey = config.apiKey
+        const baseUrl = config.baseUrl || getDefaultEndpoint('groq')
+
+        if (!apiKey) {
+          throw new Error('Groq API key is required. Please configure it in the preset settings.')
+        }
+
+        const model = getEffectiveModel(config.model || '', config.customModel)
+        if (!model) {
+          throw new Error('Groq model is required. Please configure it in the preset settings.')
+        }
+
+        return new OpenAICompatibleProvider({
+          providerType: 'groq' as OpenAIProviderType,
+          baseUrl,
+          apiKey,
+          model,
+        })
+      }
+
+      case 'ollama': {
+        const baseUrl = config.baseUrl || getDefaultEndpoint('ollama')
+
+        const model = getEffectiveModel(config.model || '', config.customModel)
+
+        if (!model) {
+          throw new Error('Ollama model is required. Please configure it in the preset settings.')
+        }
+
+        return new OpenAICompatibleProvider({
+          providerType: 'ollama' as OpenAIProviderType,
+          baseUrl,
+          model,
+        })
+      }
+
+      case 'openrouter': {
+        const apiKey = config.apiKey
+        const baseUrl = config.baseUrl || getDefaultEndpoint('openrouter')
+
+        if (!apiKey) {
+          throw new Error(
+            'OpenRouter API key is required. Please configure it in the preset settings.'
+          )
+        }
+
+        const model = getEffectiveModel(config.model || '', config.customModel)
+        if (!model) {
+          throw new Error(
+            'OpenRouter model is required. Please configure it in the preset settings.'
+          )
+        }
+
+        return new OpenAICompatibleProvider({
+          providerType: 'openrouter' as OpenAIProviderType,
+          baseUrl,
+          apiKey,
+          model,
+        })
+      }
+
+      case 'custom': {
+        const baseUrl = config.baseUrl
+        const apiKey = config.apiKey
+        const model = config.model
+
+        if (!baseUrl) {
+          throw new Error(
+            'Custom endpoint base URL is required. Please configure it in the preset settings.'
+          )
+        }
+        if (!model) {
+          throw new Error('Custom model is required. Please configure it in the preset settings.')
+        }
+
+        return new OpenAICompatibleProvider({
+          providerType: 'custom' as OpenAIProviderType,
+          baseUrl,
+          apiKey,
+          model,
+        })
+      }
+
+      default:
+        throw new Error(`Unsupported provider for custom preset: ${providerType}`)
     }
   }
 
@@ -246,5 +459,4 @@ export class KeyboardShortcutHandler {
       selection.addRange(newRange)
     }
   }
-
 }

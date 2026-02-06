@@ -22,6 +22,11 @@ export type TranslationProvider =
   | 'custom'
 
 /**
+ * LLM providers that support chat-completion API (subset of TranslationProvider)
+ */
+export type LLMProvider = 'gemini' | 'chatgpt' | 'groq' | 'ollama' | 'openrouter' | 'custom'
+
+/**
  * Translation settings
  */
 export interface TranslationSettings {
@@ -82,12 +87,27 @@ export interface BasePreset {
 }
 
 /**
+ * Per-preset provider configuration (for custom provider in presets)
+ * Generic structure that works for any provider - NOT memorized between provider changes
+ */
+export interface PresetProviderConfig {
+  apiKey?: string // API key for the current provider (if required)
+  baseUrl?: string // Base URL for the current provider (if required)
+  model?: string // Selected model from dropdown or 'custom' (for LLM providers)
+  customModel?: string // Custom model name when model === 'custom'
+}
+
+/**
  * Translation preset (triplet: sourceLang + targetLang + keyboardShortcut)
+ * Can optionally use a custom provider instead of the global one
  */
 export interface TranslationPreset extends BasePreset {
   type: 'translation'
   sourceLang: string
   targetLang: string
+  useCustomProvider?: boolean // If true, use customProvider instead of global
+  customProvider?: TranslationProvider // Provider to use when useCustomProvider is true
+  customProviderConfig?: PresetProviderConfig // Custom provider configuration (when useCustomProvider is true)
 }
 
 /**
@@ -125,9 +145,50 @@ export interface TransformationPreset extends BasePreset {
 }
 
 /**
+ * Custom char-to-char transformation stored in chrome.storage.sync
+ */
+export interface CustomTransformation {
+  id: string
+  name: string
+  charMap: Record<string, string>
+  baseStyle?: TransformationStyle // built-in style used for pre-population, if any
+  createdAt: number
+  updatedAt: number
+}
+
+/**
+ * Index of custom transformation IDs stored under a single storage key
+ */
+export interface CustomTransformIndex {
+  ids: string[]
+}
+
+/**
+ * Preset referencing a user-created custom char-map transformation
+ */
+export interface CustomTransformPreset extends BasePreset {
+  type: 'custom-transform'
+  customTransformId: string // references CustomTransformation.id
+}
+
+/**
+ * Preset that sends a prompt template to a per-preset LLM provider
+ */
+export interface LLMPromptPreset extends BasePreset {
+  type: 'llm-prompt'
+  prompt: string // template string with {{input}} placeholder
+  llmProvider: LLMProvider
+  llmModel: string // resolved model name (never 'custom')
+}
+
+/**
  * Union type for all preset types
  */
-export type Preset = TranslationPreset | TransformationPreset
+export type Preset =
+  | TranslationPreset
+  | TransformationPreset
+  | CustomTransformPreset
+  | LLMPromptPreset
 
 /**
  * Presets settings structure

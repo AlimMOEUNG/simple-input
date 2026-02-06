@@ -109,6 +109,7 @@ export default defineConfig(({ mode }) => {
         background: resolve(__dirname, 'src/background.ts'),
         'content-script': resolve(__dirname, 'src/content-script.ts'),
         popup: resolve(__dirname, 'src/popup/popup.html'),
+        options: resolve(__dirname, 'src/options/options.html'),
       },
       output: {
         entryFileNames: '[name].js',

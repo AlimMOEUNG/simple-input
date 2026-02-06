@@ -5,6 +5,7 @@
 
 import { validateDeepLKey, translateWithDeepL } from './background/utils/deeplApi'
 import { validateGeminiKey, translateWithGemini } from './background/utils/geminiApi'
+import { fetchOllamaModels } from './background/utils/ollamaApi'
 
 // Message types for API proxy
 type BackgroundMessage =
@@ -14,6 +15,7 @@ type BackgroundMessage =
       type: 'VALIDATE_OPENAI_COMPATIBLE'
       config: { providerType: string; baseUrl: string; apiKey?: string; model: string }
     }
+  | { type: 'FETCH_OLLAMA_MODELS'; baseUrl: string }
   | {
       type: 'TRANSLATE_DEEPL'
       text: string
@@ -190,6 +192,13 @@ async function handleMessage(message: BackgroundMessage): Promise<BackgroundResp
       return result.success
         ? { success: true }
         : { success: false, error: result.error || 'Validation failed' }
+    }
+
+    case 'FETCH_OLLAMA_MODELS': {
+      const result = await fetchOllamaModels(message.baseUrl)
+      return result.success
+        ? { success: true, data: { models: result.models } }
+        : { success: false, error: result.error || 'Failed to fetch models' }
     }
 
     case 'TRANSLATE_DEEPL': {

@@ -5,7 +5,7 @@
 
 import { ref, watch } from 'vue'
 import type { TranslationSettings } from './useSettings'
-import type { Preset, TranslationPreset, TransformationPreset, PresetsSettings } from '@/types/common'
+import type { Preset, TranslationPreset, TransformationPreset, CustomTransformPreset, LLMPromptPreset, PresetsSettings } from '@/types/common'
 
 /**
  * Generate a UUID v4
@@ -34,7 +34,7 @@ function generateDefaultShortcut(index: number): string {
  */
 function createDefaultPreset(
   index: number,
-  type: 'translation' | 'transformation' = 'translation'
+  type: 'translation' | 'transformation' | 'custom-transform' | 'llm-prompt' = 'translation'
 ): Preset {
   const basePreset = {
     id: generateUUID(),
@@ -50,6 +50,20 @@ function createDefaultPreset(
       transformationStyle: 'strikethrough',
       exampleText: 'Example text',
     } as TransformationPreset
+  } else if (type === 'custom-transform') {
+    return {
+      ...basePreset,
+      type: 'custom-transform',
+      customTransformId: '',
+    } as CustomTransformPreset
+  } else if (type === 'llm-prompt') {
+    return {
+      ...basePreset,
+      type: 'llm-prompt',
+      prompt: '',
+      llmProvider: 'gemini',
+      llmModel: '',
+    } as LLMPromptPreset
   } else {
     return {
       ...basePreset,
@@ -106,7 +120,7 @@ async function saveToStorage() {
  */
 function migratePresetToTyped(preset: any): Preset {
   // If preset already has type field, it's already migrated
-  if ('type' in preset && (preset.type === 'translation' || preset.type === 'transformation')) {
+  if ('type' in preset && ['translation', 'transformation', 'custom-transform', 'llm-prompt'].includes(preset.type)) {
     return preset as Preset
   }
 
@@ -144,6 +158,16 @@ function isValidPreset(preset: any): preset is Preset {
   } else if (preset.type === 'transformation') {
     // Transformation presets require transformationStyle
     return typeof preset.transformationStyle === 'string'
+  } else if (preset.type === 'custom-transform') {
+    // Custom transform presets require customTransformId
+    return typeof preset.customTransformId === 'string'
+  } else if (preset.type === 'llm-prompt') {
+    // LLM prompt presets require prompt, llmProvider, llmModel
+    return (
+      typeof preset.prompt === 'string' &&
+      typeof preset.llmProvider === 'string' &&
+      typeof preset.llmModel === 'string'
+    )
   }
 
   // Unknown type or missing type field
@@ -348,7 +372,7 @@ export function usePresetsSettings() {
   /**
    * Add a new preset with default values
    */
-  function addPreset(type: 'translation' | 'transformation' = 'translation'): Preset | null {
+  function addPreset(type: 'translation' | 'transformation' | 'custom-transform' | 'llm-prompt' = 'translation'): Preset | null {
     if (!canAddPreset()) {
       console.warn('[usePresetsSettings] Maximum presets limit reached')
       return null

@@ -113,21 +113,40 @@ export class SettingsManager {
 
   /**
    * Get a setting value (legacy method for backward compatibility)
-   * Uses the first preset's settings
+   * Uses the first preset's settings (only works if first preset is a translation preset)
    */
   get<K extends keyof Settings>(key: K): Settings[K] {
     if (key === 'provider') {
       return this.presetsSettings.provider as Settings[K]
     }
     const firstPreset = this.presetsSettings.presets[0]
+    if (firstPreset.type !== 'translation') {
+      // Fallback to defaults if first preset is not a translation preset
+      const defaults: Settings = {
+        sourceLang: 'auto',
+        targetLang: 'en',
+        provider: this.presetsSettings.provider as 'builtin' | 'deepl' | 'gemini',
+        keyboardShortcut: 'Alt+T',
+      }
+      return defaults[key]
+    }
     return firstPreset[key as keyof TranslationPreset] as Settings[K]
   }
 
   /**
    * Get all settings (legacy method)
+   * Returns defaults if first preset is not a translation preset
    */
   getAll(): Settings {
     const firstPreset = this.presetsSettings.presets[0]
+    if (firstPreset.type !== 'translation') {
+      return {
+        sourceLang: 'auto',
+        targetLang: 'en',
+        provider: this.presetsSettings.provider as 'builtin' | 'deepl' | 'gemini',
+        keyboardShortcut: firstPreset.keyboardShortcut,
+      }
+    }
     return {
       sourceLang: firstPreset.sourceLang,
       targetLang: firstPreset.targetLang,
@@ -166,14 +185,17 @@ export class SettingsManager {
 
   /**
    * Set a setting value (legacy method)
+   * Only works if first preset is a translation preset
    */
   set<K extends keyof Settings>(key: K, value: Settings[K]): void {
     if (key === 'provider') {
       this.presetsSettings.provider = value as TranslationProvider
     } else {
-      // Update first preset
+      // Update first preset only if it's a translation preset
       const firstPreset = this.presetsSettings.presets[0]
-      ;(firstPreset[key as keyof TranslationPreset] as any) = value
+      if (firstPreset.type === 'translation') {
+        ;(firstPreset[key as keyof TranslationPreset] as any) = value
+      }
     }
   }
 

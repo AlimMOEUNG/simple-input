@@ -58,16 +58,9 @@ export const PREDEFINED_MODELS = {
     { value: 'custom', label: 'Custom Model', isCustom: true },
   ] as ModelOption[],
 
+  // Ollama models are fetched dynamically from local instance
+  // This is just a fallback if fetch fails
   ollama: [
-    { value: 'llama3.2', label: 'Llama 3.2 (Recommended)' },
-    { value: 'llama3.1', label: 'Llama 3.1' },
-    { value: 'llama3', label: 'Llama 3' },
-    { value: 'llama2', label: 'Llama 2' },
-    { value: 'mistral', label: 'Mistral' },
-    { value: 'mixtral', label: 'Mixtral' },
-    { value: 'gemma2', label: 'Gemma 2' },
-    { value: 'phi3', label: 'Phi 3' },
-    { value: 'qwen2.5', label: 'Qwen 2.5' },
     { value: 'custom', label: 'Custom Model', isCustom: true },
   ] as ModelOption[],
 } as const

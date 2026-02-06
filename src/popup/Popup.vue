@@ -2,7 +2,7 @@
 <template>
   <div
     class="w-full max-w-[400px] min-w-[360px] flex flex-col bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-all duration-200 ease-in-out"
-    style="height: fit-content; min-height: fit-content;"
+    style="height: fit-content; min-height: fit-content"
   >
     <!-- Header -->
     <div
@@ -35,8 +35,12 @@
     </div>
 
     <!-- Main Navigation Tabs (Segmented Control Style) -->
-    <div class="px-3 pt-3 pb-3 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
-      <div class="main-nav-container p-1 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center relative">
+    <div
+      class="px-3 pt-3 pb-3 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800"
+    >
+      <div
+        class="main-nav-container p-1 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center relative"
+      >
         <button
           @click="currentView = 'presets'"
           :class="['main-nav-tab', { active: currentView === 'presets' }]"
@@ -67,15 +71,13 @@
             @change="onProviderChange"
             class="w-full px-2 py-1 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="google">Google Translate (Free)</option>
-            <option value="builtin">Chrome Built-in AI (Free)</option>
-            <option value="deepl">DeepL API</option>
-            <option value="gemini">Google Gemini API</option>
-            <option value="chatgpt">ChatGPT (OpenAI)</option>
-            <option value="groq">Groq (Free & Fast)</option>
-            <option value="ollama">Ollama (Local)</option>
-            <option value="openrouter">OpenRouter</option>
-            <option value="custom">Custom OpenAI-compatible</option>
+            <option
+              v-for="provider in AVAILABLE_PROVIDERS"
+              :key="provider.value"
+              :value="provider.value"
+            >
+              {{ provider.label }}
+            </option>
           </select>
         </div>
 
@@ -132,7 +134,11 @@
             v-model="providerConfigs.gemini.model"
             class="w-full px-2 py-1 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
           >
-            <option v-for="model in PREDEFINED_MODELS.gemini" :key="model.value" :value="model.value">
+            <option
+              v-for="model in PREDEFINED_MODELS.gemini"
+              :key="model.value"
+              :value="model.value"
+            >
               {{ model.label }}
             </option>
           </select>
@@ -153,7 +159,9 @@
                 : 'bg-blue-600 text-white hover:bg-blue-700'
             "
           >
-            {{ validationStatus.gemini === 'loading' ? t('apiKeyValidating') : t('apiKeyValidate') }}
+            {{
+              validationStatus.gemini === 'loading' ? t('apiKeyValidating') : t('apiKeyValidate')
+            }}
           </button>
           <p
             v-if="validationMessage.gemini"
@@ -185,7 +193,11 @@
             v-model="providerConfigs.chatgpt.model"
             class="w-full px-2 py-1 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
           >
-            <option v-for="model in PREDEFINED_MODELS.chatgpt" :key="model.value" :value="model.value">
+            <option
+              v-for="model in PREDEFINED_MODELS.chatgpt"
+              :key="model.value"
+              :value="model.value"
+            >
               {{ model.label }}
             </option>
           </select>
@@ -206,7 +218,9 @@
                 : 'bg-blue-600 text-white hover:bg-blue-700'
             "
           >
-            {{ validationStatus.chatgpt === 'loading' ? t('apiKeyValidating') : t('apiKeyValidate') }}
+            {{
+              validationStatus.chatgpt === 'loading' ? t('apiKeyValidating') : t('apiKeyValidate')
+            }}
           </button>
           <p
             v-if="validationMessage.chatgpt"
@@ -278,12 +292,52 @@
           <label class="block text-[10px] font-semibold text-gray-700 dark:text-gray-300">
             {{ t('labelBaseUrl') }}
           </label>
-          <input
-            type="text"
-            v-model="providerConfigs.ollama.baseUrl"
-            :placeholder="t('placeholderBaseUrl')"
-            class="w-full px-2 py-1 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-          />
+          <div class="flex gap-1">
+            <input
+              type="text"
+              v-model="providerConfigs.ollama.baseUrl"
+              :placeholder="t('placeholderBaseUrl')"
+              class="flex-1 px-2 py-1 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+              @blur="fetchOllamaModels"
+            />
+            <button
+              @click="fetchOllamaModels"
+              :disabled="!providerConfigs.ollama.baseUrl || ollamaModelsLoading"
+              class="px-2 py-1 text-xs rounded transition-colors"
+              :class="
+                !providerConfigs.ollama.baseUrl || ollamaModelsLoading
+                  ? 'bg-gray-300 dark:bg-gray-700 text-gray-500 cursor-not-allowed'
+                  : 'bg-gray-600 text-white hover:bg-gray-700'
+              "
+              title="Refresh available models"
+            >
+              {{ ollamaModelsLoading ? '...' : '↻' }}
+            </button>
+          </div>
+
+          <!-- Models loading/error status -->
+          <p v-if="ollamaModelsLoading" class="text-[10px] text-blue-600 dark:text-blue-400">
+            ⏳ Fetching available models...
+          </p>
+          <p
+            v-if="ollamaModelsError && !ollamaModelsLoading"
+            class="text-[10px] text-red-600 dark:text-red-400"
+          >
+            ❌ {{ ollamaModelsError }}
+          </p>
+          <p
+            v-if="ollamaModels.length > 0 && !ollamaModelsLoading"
+            class="text-[10px] text-green-600 dark:text-green-400"
+          >
+            ✅ Found {{ ollamaModels.length }} local model(s)
+          </p>
+          <p
+            v-if="!ollamaModelsLoading && !ollamaModelsError && ollamaModels.length === 0"
+            class="text-[10px] text-gray-500 dark:text-gray-400"
+          >
+            💡 Click ↻ to load your installed Ollama models
+          </p>
+
           <label class="block text-[10px] font-semibold text-gray-700 dark:text-gray-300">
             {{ t('labelModel') }}
           </label>
@@ -291,7 +345,7 @@
             v-model="providerConfigs.ollama.model"
             class="w-full px-2 py-1 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
           >
-            <option v-for="model in PREDEFINED_MODELS.ollama" :key="model.value" :value="model.value">
+            <option v-for="model in ollamaModelOptions" :key="model.value" :value="model.value">
               {{ model.label }}
             </option>
           </select>
@@ -312,7 +366,9 @@
                 : 'bg-blue-600 text-white hover:bg-blue-700'
             "
           >
-            {{ validationStatus.ollama === 'loading' ? t('apiKeyValidating') : t('apiKeyValidate') }}
+            {{
+              validationStatus.ollama === 'loading' ? t('apiKeyValidating') : t('apiKeyValidate')
+            }}
           </button>
           <p
             v-if="validationMessage.ollama"
@@ -344,7 +400,11 @@
             v-model="providerConfigs.openrouter.model"
             class="w-full px-2 py-1 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
           >
-            <option v-for="model in PREDEFINED_MODELS.openrouter" :key="model.value" :value="model.value">
+            <option
+              v-for="model in PREDEFINED_MODELS.openrouter"
+              :key="model.value"
+              :value="model.value"
+            >
               {{ model.label }}
             </option>
           </select>
@@ -368,7 +428,9 @@
             "
           >
             {{
-              validationStatus.openrouter === 'loading' ? t('apiKeyValidating') : t('apiKeyValidate')
+              validationStatus.openrouter === 'loading'
+                ? t('apiKeyValidating')
+                : t('apiKeyValidate')
             }}
           </button>
           <p
@@ -428,7 +490,9 @@
                 : 'bg-blue-600 text-white hover:bg-blue-700'
             "
           >
-            {{ validationStatus.custom === 'loading' ? t('apiKeyValidating') : t('apiKeyValidate') }}
+            {{
+              validationStatus.custom === 'loading' ? t('apiKeyValidating') : t('apiKeyValidate')
+            }}
           </button>
           <p
             v-if="validationMessage.custom"
@@ -462,11 +526,7 @@
             :disabled="!canAddPreset()"
             class="preset-tab add-tab"
             :class="{ disabled: !canAddPreset() }"
-            :title="
-              canAddPreset()
-                ? t('addPreset')
-                : `Maximum ${maxPresets} presets reached`
-            "
+            :title="canAddPreset() ? t('addPreset') : `Maximum ${maxPresets} presets reached`"
           >
             +
           </button>
@@ -478,6 +538,7 @@
           :preset="activePreset"
           :all-presets="presetsSettings.presets"
           :can-delete="presetsSettings.presets.length > 1"
+          :global-provider="presetsSettings.provider"
           @update-preset="updatePreset"
           @delete-preset="deletePreset"
         />
@@ -495,6 +556,7 @@ import { useSettings } from '@/composables/useSettings'
 import { usePresetsSettings } from '@/composables/usePresetsSettings'
 import { usePopupState } from '@/composables/usePopupState'
 import { PREDEFINED_MODELS, isCustomModel, getEffectiveModel } from '@/config/predefinedModels'
+import { AVAILABLE_PROVIDERS } from '@/config/providers'
 import type { SupportedLocale } from '@/core/utils/i18n'
 import type { Preset } from '@/types/common'
 import PresetEditor from '@/components/PresetEditor.vue'
@@ -574,6 +636,22 @@ const validationMessage = ref({
   custom: '',
 })
 
+// Ollama dynamic models fetching
+const ollamaModels = ref<Array<{ value: string; label: string }>>([])
+const ollamaModelsLoading = ref(false)
+const ollamaModelsError = ref('')
+
+// Computed property for Ollama model options (dynamic + fallback)
+const ollamaModelOptions = computed(() => {
+  if (ollamaModels.value.length > 0) {
+    // Use dynamic models when available
+    return [...ollamaModels.value, { value: 'custom', label: 'Custom Model', isCustom: true }]
+  }
+  // Minimal fallback: only Custom Model option
+  // User must click refresh (↻) to load their installed models
+  return [{ value: 'custom', label: 'Custom Model (Click ↻ to load models)', isCustom: true }]
+})
+
 // Get active preset
 const activePreset = computed(() => {
   return getActivePreset()
@@ -612,6 +690,11 @@ onMounted(() => {
   // Settings are automatically loaded by useStorageState
   // Check if current provider configuration is complete
   checkProviderConfiguration()
+
+  // Auto-fetch Ollama models if Ollama is the current provider
+  if (presetsSettings.value.provider === 'ollama' && providerConfigs.value.ollama.baseUrl) {
+    fetchOllamaModels()
+  }
 })
 
 async function validateProviderConfig(provider: string) {
@@ -648,11 +731,14 @@ async function validateProviderConfig(provider: string) {
       case 'ollama':
       case 'openrouter':
       case 'custom': {
-        const config = providerConfigs.value[provider as keyof typeof providerConfigs.value]
+        const config = providerConfigs.value[provider as keyof typeof providerConfigs.value] as {
+          model: string
+          customModel?: string
+          apiKey?: string
+          baseUrl?: string
+        }
         const effectiveModel =
-          provider === 'custom'
-            ? config.model
-            : getEffectiveModel(config.model, config.customModel)
+          provider === 'custom' ? config.model : getEffectiveModel(config.model, config.customModel)
         response = await chrome.runtime.sendMessage({
           type: 'VALIDATE_OPENAI_COMPATIBLE',
           config: {
@@ -685,10 +771,61 @@ async function validateProviderConfig(provider: string) {
   }
 }
 
+/**
+ * Fetch available models from Ollama instance
+ * Uses dynamic API call with fallback to static list
+ */
+async function fetchOllamaModels() {
+  const baseUrl = providerConfigs.value.ollama.baseUrl
+
+  if (!baseUrl) {
+    ollamaModelsError.value = 'Please configure Ollama Base URL first'
+    return
+  }
+
+  ollamaModelsLoading.value = true
+  ollamaModelsError.value = ''
+
+  try {
+    const response = await chrome.runtime.sendMessage({
+      type: 'FETCH_OLLAMA_MODELS',
+      baseUrl,
+    })
+
+    if (response.success && response.data?.models) {
+      // Transform Ollama models to dropdown options
+      ollamaModels.value = response.data.models.map((model: { name: string }) => ({
+        value: model.name,
+        label: model.name,
+      }))
+
+      // If current model is not in the list, reset to first model
+      if (
+        providerConfigs.value.ollama.model &&
+        providerConfigs.value.ollama.model !== 'custom' &&
+        !ollamaModels.value.some((m) => m.value === providerConfigs.value.ollama.model)
+      ) {
+        providerConfigs.value.ollama.model = ollamaModels.value[0]?.value || ''
+      }
+    } else {
+      ollamaModelsError.value = response.error || 'Failed to fetch models'
+    }
+  } catch (error) {
+    ollamaModelsError.value = error instanceof Error ? error.message : 'Unknown error'
+  } finally {
+    ollamaModelsLoading.value = false
+  }
+}
+
 function onProviderChange() {
   // Settings are automatically saved by useStorageState
   // Check if the selected provider has the required configuration
   checkProviderConfiguration()
+
+  // Auto-fetch Ollama models when Ollama provider is selected
+  if (presetsSettings.value.provider === 'ollama' && providerConfigs.value.ollama.baseUrl) {
+    fetchOllamaModels()
+  }
 }
 
 /**

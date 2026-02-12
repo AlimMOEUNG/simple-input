@@ -216,6 +216,34 @@ npm run build:all:dev   # Both browsers, development mode
 
 ---
 
+## Testing
+
+The project uses **[Vitest](https://vitest.dev/)** — the natural choice for a Vite-based project (shared config, same transform pipeline, fast HMR-aware watch mode).
+
+### Run tests
+
+```bash
+npm test               # Run once
+npm run test:watch     # Watch mode
+npm run test:coverage  # With coverage report
+```
+
+### What is tested and why
+
+| Suite | File | Rationale |
+|---|---|---|
+| `TransformationEngine` | `tests/TransformationEngine.test.ts` | Pure deterministic functions — no I/O, no deps, maximum ROI |
+| Keyboard shortcut validation | `tests/keyboardUtils.test.ts` | Core business logic (normalization, conflict detection) — zero external dependencies |
+| `usePresetsSettings` CRUD | `tests/usePresetsSettings.test.ts` | State management composable — covers add / update / delete / uniqueness validation |
+
+### Why no E2E or component rendering tests?
+
+**E2E tests are impractical for Manifest V3 extensions.** The `chrome.*` APIs (storage, runtime messaging, tabs) only exist inside the real browser extension context. Playwright and Cypress do not support MV3 service workers, popup sandboxing, or cross-origin content script injection out of the box. Wiring up a real browser test harness would require browser-specific tooling (e.g. `puppeteer-browser-extension`) with significant setup cost for marginal gain — the critical logic is already covered by unit tests.
+
+**Component rendering tests** (`@vue/test-utils` + jsdom) would exercise Vue's rendering engine more than our own code. The actual business logic — state management, transformations, shortcut validation — lives in pure TypeScript modules and composables, which are already unit-tested without a DOM.
+
+---
+
 ## Tech stack
 
 | Tool | Version | Role |

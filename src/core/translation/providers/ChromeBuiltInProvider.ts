@@ -14,7 +14,6 @@ export class ChromeBuiltInProvider extends BaseTranslationProvider {
   readonly requiresApiKey = false
 
   private translator: any = null
-  private languageDetector: any = null
   private translatorKey: string | null = null
 
   /**
@@ -109,7 +108,6 @@ export class ChromeBuiltInProvider extends BaseTranslationProvider {
    */
   destroy(): void {
     this.translator = null
-    this.languageDetector = null
     this.translatorKey = null
   }
 }

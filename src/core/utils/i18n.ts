@@ -221,9 +221,12 @@ const frTranslations: TranslationMap = {
   presetDeleteTitle: 'Delete Preset?',
   presetDeleteMessage: 'Are you sure you want to delete "{name}"? This action cannot be undone.',
   presetDeleteConfirm: 'Êtes-vous sûr de vouloir supprimer "{name}" ?',
+  languagesLabel: 'Languages',
   shortcutInvalidFormat:
     'Format de raccourci invalide. Doit avoir un modificateur (ex: Alt+T, Alt, Ctrl+1)',
+  shortcutModifierOnly: 'Modifier-only shortcuts (Alt, Ctrl, etc.) are not allowed to prevent conflicts',
   shortcutDuplicate: 'Raccourci déjà utilisé par "{name}"',
+  shortcutConflictTitle: 'Keyboard Shortcut Conflict',
   shortcutTooManyKeys: 'Trop de touches. Maximum 2 touches après les modificateurs (ex: Alt+T+1)',
   shortcutHelp:
     'Supporte: modificateur (Alt), modificateur+touche (Alt+T), ou séquences (Alt+T+1). Max 2 touches.',
@@ -233,6 +236,8 @@ const frTranslations: TranslationMap = {
   cancel: 'Annuler',
   undo: 'Annuler',
   undoChanges: 'Annuler les changements',
+  validationError: 'Validation error',
+  ok: 'OK',
   howToUse: 'Comment utiliser :',
   usageSelect: 'Sélectionnez du texte et appuyez sur {shortcut} pour le traduire',
   usageInput:
@@ -337,9 +342,12 @@ const esTranslations: TranslationMap = {
   presetDeleteTitle: 'Delete Preset?',
   presetDeleteMessage: 'Are you sure you want to delete "{name}"? This action cannot be undone.',
   presetDeleteConfirm: '¿Está seguro de que desea eliminar "{name}"?',
+  languagesLabel: 'Languages',
   shortcutInvalidFormat:
     'Formato de atajo inválido. Debe tener un modificador (ej: Alt+T, Alt, Ctrl+1)',
+  shortcutModifierOnly: 'Modifier-only shortcuts (Alt, Ctrl, etc.) are not allowed to prevent conflicts',
   shortcutDuplicate: 'Atajo ya utilizado por "{name}"',
+  shortcutConflictTitle: 'Keyboard Shortcut Conflict',
   shortcutTooManyKeys:
     'Demasiadas teclas. Máximo 2 teclas después de los modificadores (ej: Alt+T+1)',
   shortcutHelp:
@@ -350,6 +358,8 @@ const esTranslations: TranslationMap = {
   cancel: 'Cancelar',
   undo: 'Deshacer',
   undoChanges: 'Deshacer cambios',
+  validationError: 'Validation error',
+  ok: 'OK',
   howToUse: 'Cómo usar:',
   usageSelect: 'Seleccione texto y presione {shortcut} para traducirlo',
   usageInput: 'Enfóquese en un campo de entrada y presione {shortcut} para traducir el contenido',
@@ -453,9 +463,12 @@ const deTranslations: TranslationMap = {
   presetDeleteTitle: 'Delete Preset?',
   presetDeleteMessage: 'Are you sure you want to delete "{name}"? This action cannot be undone.',
   presetDeleteConfirm: 'Möchten Sie "{name}" wirklich löschen?',
+  languagesLabel: 'Languages',
   shortcutInvalidFormat:
     'Ungültiges Tastenkombinationsformat. Muss einen Modifikator haben (z.B. Alt+T, Alt, Ctrl+1)',
+  shortcutModifierOnly: 'Modifier-only shortcuts (Alt, Ctrl, etc.) are not allowed to prevent conflicts',
   shortcutDuplicate: 'Tastenkombination wird bereits von "{name}" verwendet',
+  shortcutConflictTitle: 'Keyboard Shortcut Conflict',
   shortcutTooManyKeys: 'Zu viele Tasten. Maximal 2 Tasten nach Modifikatoren (z.B. Alt+T+1)',
   shortcutHelp:
     'Unterstützt: Modifikator (Alt), Modifikator+Taste (Alt+T), oder Sequenzen (Alt+T+1). Max 2 Tasten.',
@@ -465,6 +478,8 @@ const deTranslations: TranslationMap = {
   cancel: 'Abbrechen',
   undo: 'Rückgängig',
   undoChanges: 'Änderungen rückgängig machen',
+  validationError: 'Validation error',
+  ok: 'OK',
   howToUse: 'Verwendung:',
   usageSelect: 'Wählen Sie Text aus und drücken Sie {shortcut}, um ihn zu übersetzen',
   usageInput:
@@ -567,8 +582,11 @@ const zhTranslations: TranslationMap = {
   presetDeleteTitle: 'Delete Preset?',
   presetDeleteMessage: 'Are you sure you want to delete "{name}"? This action cannot be undone.',
   presetDeleteConfirm: '确定要删除 "{name}" 吗？',
+  languagesLabel: 'Languages',
   shortcutInvalidFormat: '快捷键格式无效。必须包含修饰键（例如：Alt+T, Alt, Ctrl+1）',
+  shortcutModifierOnly: 'Modifier-only shortcuts (Alt, Ctrl, etc.) are not allowed to prevent conflicts',
   shortcutDuplicate: '快捷键已被 "{name}" 使用',
+  shortcutConflictTitle: 'Keyboard Shortcut Conflict',
   shortcutTooManyKeys: '按键过多。修饰键后最多 2 个按键（例如：Alt+T+1）',
   shortcutHelp: '支持：修饰键（Alt），修饰键+按键（Alt+T），或序列（Alt+T+1）。最多 2 个按键。',
   cannotDeleteLastPreset: '无法删除最后一个预设',
@@ -577,6 +595,8 @@ const zhTranslations: TranslationMap = {
   cancel: '取消',
   undo: '撤销',
   undoChanges: '撤销更改',
+  validationError: 'Validation error',
+  ok: 'OK',
   howToUse: '如何使用：',
   usageSelect: '选择文本并按 {shortcut} 翻译',
   usageInput: '聚焦输入字段并按 {shortcut} 翻译内容',
@@ -679,9 +699,12 @@ const jaTranslations: TranslationMap = {
   presetDeleteTitle: 'Delete Preset?',
   presetDeleteMessage: 'Are you sure you want to delete "{name}"? This action cannot be undone.',
   presetDeleteConfirm: '"{name}" を削除してもよろしいですか？',
+  languagesLabel: 'Languages',
   shortcutInvalidFormat:
     'ショートカット形式が無効です。修飾キーが必要です（例：Alt+T, Alt, Ctrl+1）',
+  shortcutModifierOnly: 'Modifier-only shortcuts (Alt, Ctrl, etc.) are not allowed to prevent conflicts',
   shortcutDuplicate: 'ショートカットは既に "{name}" で使用されています',
+  shortcutConflictTitle: 'Keyboard Shortcut Conflict',
   shortcutTooManyKeys: 'キーが多すぎます。修飾キーの後に最大2つのキー（例：Alt+T+1）',
   shortcutHelp:
     'サポート：修飾キー（Alt），修飾キー+キー（Alt+T），またはシーケンス（Alt+T+1）。最大2キー。',
@@ -691,6 +714,8 @@ const jaTranslations: TranslationMap = {
   cancel: 'キャンセル',
   undo: '元に戻す',
   undoChanges: '変更を元に戻す',
+  validationError: 'Validation error',
+  ok: 'OK',
   howToUse: '使い方：',
   usageSelect: 'テキストを選択して {shortcut} を押して翻訳',
   usageInput: '入力フィールドにフォーカスして {shortcut} を押してコンテンツを翻訳',
@@ -853,7 +878,8 @@ export function setLocale(locale: SupportedLocale): void {
  * getLanguageDisplayName('ja', 'fr') // "japonais"
  * getLanguageDisplayName('es') // "Spanish" (if UI is in English)
  */
-export function getLanguageDisplayName(code: string, displayLocale?: SupportedLocale): string {
+// displayLocale accepts any BCP-47 tag so callers can pass raw LanguageCode values
+export function getLanguageDisplayName(code: string, displayLocale?: string): string {
   try {
     const locale = displayLocale || activeLocale.value
     const displayNames = new Intl.DisplayNames([locale], { type: 'language' })

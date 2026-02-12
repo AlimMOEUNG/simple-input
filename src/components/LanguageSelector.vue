@@ -131,9 +131,17 @@ watch(showDropdown, (isOpen) => {
   }
 })
 
+// Entry type is widened to string so the 'auto' pseudo-entry can be included
+interface LanguageOption {
+  code: string
+  flag: string
+  displayName: string
+  searchableText: string
+}
+
 // Computed: liste des langues avec noms localisés
-const availableLanguages = computed(() => {
-  const languages = SUPPORTED_LANGUAGES.map((lang) => {
+const availableLanguages = computed((): LanguageOption[] => {
+  const languages: LanguageOption[] = SUPPORTED_LANGUAGES.map((lang) => {
     const nameInUI = getLanguageDisplayName(lang.code, locale.value)
     const nameNative = getLanguageDisplayName(lang.code, lang.code)
 

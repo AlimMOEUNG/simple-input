@@ -74,7 +74,7 @@ export abstract class BaseTranslationProvider {
    * @returns true if text is valid for translation
    */
   protected isValidText(text: string): boolean {
-    return text && text.trim().length > 0
+    return !!text && text.trim().length > 0
   }
 
   /**

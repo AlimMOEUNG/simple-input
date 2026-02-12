@@ -1,14 +1,12 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <div class="space-y-2">
-    <!-- Preset tab bar with add button and provider shortcut -->
+    <!-- Preset tab bar with add button -->
     <PresetTabs
       :presets="presetsSettings.presets as TranslationPreset[]"
       :active-preset-id="presetsSettings.activePresetId"
-      :provider="presetsSettings.provider"
       @select-preset="selectPreset"
       @add-preset="addPreset"
-      @toggle-provider="goToProvider"
     />
 
     <!-- Active preset editor -->
@@ -27,14 +25,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { usePresetsSettings } from '@/composables/usePresetsSettings'
-import { usePopupState } from '@/composables/usePopupState'
 import { useI18nWrapper } from '@/composables/useI18nWrapper'
 import PresetTabs from '@/components/PresetTabs.vue'
 import PresetEditor from '@/components/PresetEditor.vue'
 import type { Preset, TranslationPreset } from '@/types/common'
 
 const { t } = useI18nWrapper()
-const { currentView } = usePopupState()
 
 const {
   presetsSettings,
@@ -77,8 +73,4 @@ function deletePreset(id: string) {
   deletePresetHelper(id)
 }
 
-// Navigate to the provider configuration tab
-function goToProvider() {
-  currentView.value = 'provider'
-}
 </script>

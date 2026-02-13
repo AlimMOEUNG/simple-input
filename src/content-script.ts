@@ -111,6 +111,31 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
   }
 })
 
+// Listen for messages from the background script (e.g., context menu trigger)
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message.type !== 'TRIGGER_PINNED_PRESET') return false
+
+  // Guard: components must be initialized before handling the message
+  if (!settings || !keyboardHandler) {
+    console.warn('[Content] TRIGGER_PINNED_PRESET received but not yet initialized')
+    sendResponse({ success: false, error: 'Content script not initialized' })
+    return false
+  }
+
+  const pinnedPreset = settings.getPinnedPreset()
+  if (!pinnedPreset) {
+    sendResponse({ success: false, error: 'No pinned preset found' })
+    return false
+  }
+
+  keyboardHandler
+    .triggerPreset(pinnedPreset)
+    .then(() => sendResponse({ success: true }))
+    .catch((error) => sendResponse({ success: false, error: error.message }))
+
+  return true // Keep channel open for async response
+})
+
 // Cleanup on page unload
 window.addEventListener('beforeunload', () => {
   if (keyboardHandler) {

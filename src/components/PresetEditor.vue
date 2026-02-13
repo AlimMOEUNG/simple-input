@@ -341,6 +341,22 @@
       <p v-if="shortcutError" class="text-[10px] text-red-600 mt-0.5">
         {{ shortcutError }}
       </p>
+      <!-- Pinned preset checkbox for right-click context menu -->
+      <div class="flex items-center gap-2 mt-1">
+        <input
+          type="checkbox"
+          :id="`pinned-preset-${localPreset.id}`"
+          :checked="isPinned"
+          @change="handlePinChange"
+          class="w-3.5 h-3.5 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-1 focus:ring-blue-500"
+        />
+        <label
+          :for="`pinned-preset-${localPreset.id}`"
+          class="text-[10px] text-gray-600 dark:text-gray-400 cursor-pointer"
+        >
+          {{ t('pinnedPresetLabel') }}
+        </label>
+      </div>
     </div>
 
     <!-- Unsaved changes warning banner -->
@@ -462,6 +478,7 @@ interface Props {
   allPresets: Preset[]
   canDelete: boolean
   globalProvider?: TranslationProvider
+  isPinned?: boolean
 }
 
 const props = defineProps<Props>()
@@ -469,6 +486,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   'update-preset': [preset: Preset]
   'delete-preset': [id: string]
+  'set-pinned': [id: string]
 }>()
 
 // ─── Local editor state ──────────────────────────────────────────
@@ -747,6 +765,18 @@ function handleModeChange(
     }
   }
   console.log('[PresetEditor] Mode changed to:', newType)
+}
+
+// ─── Pin ─────────────────────────────────────────────────────────
+
+/**
+ * Handle pin checkbox change.
+ * No-op if this preset is already pinned (cannot unpin without pinning another).
+ * Emits 'set-pinned' to let the parent immediately persist the change.
+ */
+function handlePinChange() {
+  if (props.isPinned) return // Already pinned, no-op
+  emit('set-pinned', props.preset.id)
 }
 
 // ─── Undo / Options ──────────────────────────────────────────────

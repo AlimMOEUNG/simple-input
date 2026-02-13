@@ -16,8 +16,10 @@
       :all-presets="presetsSettings.presets"
       :can-delete="presetsSettings.presets.length > 1"
       :global-provider="presetsSettings.provider"
+      :is-pinned="presetsSettings.pinnedPresetId === activePreset.id"
       @update-preset="updatePreset"
       @delete-preset="deletePreset"
+      @set-pinned="setPinnedPreset"
     />
   </div>
 </template>
@@ -39,6 +41,7 @@ const {
   deletePreset: deletePresetHelper,
   setActivePreset,
   getActivePreset,
+  setPinnedPreset,
   canAddPreset,
   maxPresets,
 } = usePresetsSettings()

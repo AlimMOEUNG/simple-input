@@ -43,21 +43,25 @@ export class SettingsManager {
   }
 
   // New presets-based settings
-  private presetsSettings: PresetsSettings = {
-    presets: [
-      {
-        id: generateUUID(),
-        name: 'Preset 1',
-        type: 'translation',
-        sourceLang: 'auto',
-        targetLang: 'en',
-        keyboardShortcut: 'Ctrl+Alt+T', // Intuitive default for translation
-        createdAt: Date.now(),
-      },
-    ],
-    activePresetId: null,
-    provider: 'google',
-  }
+  private presetsSettings: PresetsSettings = (() => {
+    const defaultPresetId = generateUUID()
+    return {
+      presets: [
+        {
+          id: defaultPresetId,
+          name: 'Preset 1',
+          type: 'translation',
+          sourceLang: 'auto',
+          targetLang: 'en',
+          keyboardShortcut: 'Ctrl+Alt+T', // Intuitive default for translation
+          createdAt: Date.now(),
+        },
+      ],
+      activePresetId: null,
+      provider: 'google',
+      pinnedPresetId: defaultPresetId, // First preset is pinned by default
+    } as PresetsSettings
+  })()
 
   /**
    * Load settings from chrome.storage.sync
@@ -95,6 +99,7 @@ export class SettingsManager {
           presets: [migratedPreset],
           activePresetId: migratedPreset.id,
           provider: this.settings.provider as TranslationProvider,
+          pinnedPresetId: migratedPreset.id, // Pin the first preset by default
         }
 
         // Save migrated settings
@@ -189,6 +194,26 @@ export class SettingsManager {
    */
   getSelectionModifier(): SelectionModifier {
     return this.presetsSettings.selectionModifier ?? 'Alt'
+  }
+
+  /**
+   * Get the pinned preset ID (used for right-click context menu)
+   */
+  getPinnedPresetId(): string | null {
+    return this.presetsSettings.pinnedPresetId ?? null
+  }
+
+  /**
+   * Get the pinned preset object; falls back to first preset if pinnedPresetId is missing or stale
+   */
+  getPinnedPreset(): Preset | undefined {
+    const pinnedId = this.presetsSettings.pinnedPresetId
+    if (pinnedId) {
+      const preset = this.presetsSettings.presets.find((p) => p.id === pinnedId)
+      if (preset) return preset
+    }
+    // Fallback to first preset
+    return this.presetsSettings.presets[0]
   }
 
   /**

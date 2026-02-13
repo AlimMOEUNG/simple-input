@@ -203,4 +203,5 @@ export interface PresetsSettings {
   activePresetId: string | null
   provider: TranslationProvider
   selectionModifier?: SelectionModifier
+  pinnedPresetId: string | null // ID of the preset used for the right-click context menu
 }

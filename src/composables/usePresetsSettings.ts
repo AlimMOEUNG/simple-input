@@ -97,6 +97,7 @@ function getDefaultPresetsSettings(): PresetsSettings {
     presets: [defaultPreset],
     activePresetId: defaultPreset.id,
     provider: 'google',
+    pinnedPresetId: defaultPreset.id, // First preset is pinned by default for context menu
   }
 }
 
@@ -236,9 +237,15 @@ async function loadFromStorage() {
       if (isValidPresetsSettings(migratedData)) {
         presetsSettings.value = migratedData
 
-        // Save migrated data if we had to migrate any presets
-        const hadMigration = result.presetsSettings.presets.some((p: any) => !('type' in p))
-        if (hadMigration) {
+        // Backfill pinnedPresetId if missing (migration for existing users)
+        let needsSave = result.presetsSettings.presets.some((p: any) => !('type' in p))
+        if (presetsSettings.value.pinnedPresetId === undefined || presetsSettings.value.pinnedPresetId === null) {
+          presetsSettings.value.pinnedPresetId = presetsSettings.value.presets[0].id
+          needsSave = true
+          console.log('[usePresetsSettings] Backfilled pinnedPresetId')
+        }
+
+        if (needsSave) {
           await chrome.storage.sync.set({ presetsSettings: presetsSettings.value })
           console.log('[usePresetsSettings] Migrated presets to typed format')
         } else {
@@ -271,6 +278,7 @@ async function loadFromStorage() {
         presets: [migratedPreset],
         activePresetId: migratedPreset.id,
         provider: oldSettings.provider,
+        pinnedPresetId: migratedPreset.id, // Pin the first preset by default
       }
 
       // Save migrated settings
@@ -430,6 +438,12 @@ export function usePresetsSettings() {
       presetsSettings.value.activePresetId = presetsSettings.value.presets[0].id
     }
 
+    // If deleted preset was pinned, transfer pin to the first remaining preset
+    if (presetsSettings.value.pinnedPresetId === id) {
+      presetsSettings.value.pinnedPresetId = presetsSettings.value.presets[0].id
+      console.log('[usePresetsSettings] Pinned preset deleted, transferred pin to:', presetsSettings.value.pinnedPresetId)
+    }
+
     console.log('[usePresetsSettings] Deleted preset:', id)
     return true
   }
@@ -483,6 +497,37 @@ export function usePresetsSettings() {
   }
 
   /**
+   * Set the pinned preset (used for right-click context menu)
+   */
+  function setPinnedPreset(id: string): boolean {
+    const preset = getPresetById(id)
+
+    if (!preset) {
+      console.error('[usePresetsSettings] Preset not found for pinning:', id)
+      return false
+    }
+
+    presetsSettings.value.pinnedPresetId = id
+    console.log('[usePresetsSettings] Pinned preset set to:', id)
+    return true
+  }
+
+  /**
+   * Get the pinned preset (fallback to first preset if pinned ID is invalid)
+   */
+  function getPinnedPreset(): Preset | undefined {
+    const pinnedId = presetsSettings.value.pinnedPresetId
+
+    if (pinnedId) {
+      const preset = getPresetById(pinnedId)
+      if (preset) return preset
+    }
+
+    // Fallback to first preset
+    return presetsSettings.value.presets[0]
+  }
+
+  /**
    * Validate shortcut uniqueness across all presets
    */
   function validateShortcutUniqueness(
@@ -516,6 +561,8 @@ export function usePresetsSettings() {
     getPresetById,
     getActivePreset,
     setActivePreset,
+    setPinnedPreset,
+    getPinnedPreset,
     validateShortcutUniqueness,
     generateDefaultShortcut,
     canAddPreset,

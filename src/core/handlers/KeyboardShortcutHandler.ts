@@ -112,6 +112,23 @@ export class KeyboardShortcutHandler {
   }
 
   /**
+   * Publicly trigger a preset directly (used by context menu via content script)
+   * Reuses the same handleShortcut logic as keyboard shortcuts
+   */
+  public async triggerPreset(preset: Preset): Promise<void> {
+    if (this.isProcessing) {
+      console.log('[KeyboardShortcut] Already processing, skipping triggerPreset')
+      return
+    }
+    this.isProcessing = true
+    try {
+      await this.handleShortcut(preset)
+    } finally {
+      this.isProcessing = false
+    }
+  }
+
+  /**
    * Handle keydown events and detect configured shortcuts
    * Supports both simple shortcuts and multi-key sequences
    */

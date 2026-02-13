@@ -147,6 +147,10 @@ const enTranslations = {
   validationLLMModelRequired: 'Please enter a model name',
   validationCustomProviderRequired: 'Please select a custom provider',
 
+  // Pinned preset (right-click context menu)
+  pinnedPresetLabel: 'Use for right-click menu',
+  contextMenuTitle: '{name}',
+
   // Word selection modifier (Global tab)
   selectionModifierLabel: 'Word Selection Modifier',
   selectionModifierHelp:
@@ -298,6 +302,8 @@ const frTranslations: TranslationMap = {
   optionsCancelButton: 'Cancel',
   optionsMaxReached: 'Maximum of {max} transformations reached',
   optionsEmptyName: 'Name is required',
+  pinnedPresetLabel: 'Use for right-click menu',
+  contextMenuTitle: '{name}',
   selectionModifierLabel: 'Word Selection Modifier',
   selectionModifierHelp:
     'Hold Modifier+Arrow keys in any focused input to select text word by word. Great for quickly selecting words before translating with a keyboard shortcut!',
@@ -423,6 +429,8 @@ const esTranslations: TranslationMap = {
   optionsCancelButton: 'Cancel',
   optionsMaxReached: 'Maximum of {max} transformations reached',
   optionsEmptyName: 'Name is required',
+  pinnedPresetLabel: 'Use for right-click menu',
+  contextMenuTitle: '{name}',
   selectionModifierLabel: 'Word Selection Modifier',
   selectionModifierHelp:
     'Hold Modifier+Arrow keys in any focused input to select text word by word. Great for quickly selecting words before translating with a keyboard shortcut!',
@@ -548,6 +556,8 @@ const deTranslations: TranslationMap = {
   optionsCancelButton: 'Cancel',
   optionsMaxReached: 'Maximum of {max} transformations reached',
   optionsEmptyName: 'Name is required',
+  pinnedPresetLabel: 'Use for right-click menu',
+  contextMenuTitle: '{name}',
   selectionModifierLabel: 'Word Selection Modifier',
   selectionModifierHelp:
     'Hold Modifier+Arrow keys in any focused input to select text word by word. Great for quickly selecting words before translating with a keyboard shortcut!',
@@ -668,6 +678,8 @@ const zhTranslations: TranslationMap = {
   optionsCancelButton: 'Cancel',
   optionsMaxReached: 'Maximum of {max} transformations reached',
   optionsEmptyName: 'Name is required',
+  pinnedPresetLabel: 'Use for right-click menu',
+  contextMenuTitle: '{name}',
   selectionModifierLabel: 'Word Selection Modifier',
   selectionModifierHelp:
     'Hold Modifier+Arrow keys in any focused input to select text word by word. Great for quickly selecting words before translating with a keyboard shortcut!',
@@ -791,6 +803,8 @@ const jaTranslations: TranslationMap = {
   optionsCancelButton: 'Cancel',
   optionsMaxReached: 'Maximum of {max} transformations reached',
   optionsEmptyName: 'Name is required',
+  pinnedPresetLabel: 'Use for right-click menu',
+  contextMenuTitle: '{name}',
   selectionModifierLabel: 'Word Selection Modifier',
   selectionModifierHelp:
     'Hold Modifier+Arrow keys in any focused input to select text word by word. Great for quickly selecting words before translating with a keyboard shortcut!',

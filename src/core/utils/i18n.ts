@@ -145,6 +145,7 @@ const enTranslations = {
   llmPromptProviderLabel: 'LLM Provider',
   llmPromptModelLabel: 'Model',
   llmPromptModelPlaceholder: 'Enter model name',
+  expandPrompt: 'Expand prompt editor',
 
   // Preset validation
   validationCustomTransformRequired: 'Please select a custom transformation',

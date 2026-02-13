@@ -271,23 +271,31 @@
 
       <!-- LLM Prompt Panel -->
       <template v-else-if="localPreset.type === 'llm-prompt'">
-        <div class="flex items-start gap-2">
-          <label
-            class="text-[10px] font-semibold text-gray-700 dark:text-gray-300 w-24 shrink-0 pt-1.5"
-          >
-            {{ t('llmPromptLabel') }}
-          </label>
-          <div class="flex-1 space-y-1">
-            <textarea
-              v-model="localPreset.prompt"
-              :placeholder="t('llmPromptPlaceholder')"
-              rows="3"
-              class="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
-            />
-            <p class="text-[10px] text-gray-500 dark:text-gray-400">
-              {{ t('llmPromptHint') }}
-            </p>
+        <div class="flex flex-col gap-1">
+          <!-- Label inline with expand button right next to it -->
+          <div class="flex items-center gap-1">
+            <span class="text-[10px] font-semibold text-gray-700 dark:text-gray-300">
+              {{ t('llmPromptLabel') }}
+            </span>
+            <button
+              type="button"
+              :title="t('expandPrompt')"
+              @click="showPromptModal = true"
+              class="flex items-center px-1 py-0.5 rounded border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 hover:border-blue-400 dark:hover:border-blue-500 bg-white dark:bg-gray-800 transition-colors"
+            >
+              <Maximize2 :size="10" />
+            </button>
           </div>
+          <!-- Full-width textarea + hint -->
+          <textarea
+            v-model="localPreset.prompt"
+            :placeholder="t('llmPromptPlaceholder')"
+            rows="3"
+            class="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+          />
+          <p class="text-[10px] text-gray-500 dark:text-gray-400">
+            {{ t('llmPromptHint') }}
+          </p>
         </div>
         <div class="flex items-center gap-2">
           <label class="text-[10px] font-semibold text-gray-700 dark:text-gray-300 w-24 shrink-0">
@@ -435,6 +443,47 @@
       @cancel="showValidationDialog = false"
     />
 
+    <!-- Expanded prompt modal — full-size textarea overlay -->
+    <Teleport to="body">
+      <div
+        v-if="showPromptModal && localPreset.type === 'llm-prompt'"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+        @click.self="showPromptModal = false"
+      >
+        <!-- Modal fills almost the full popup height with a small margin -->
+        <div
+          class="w-[360px] bg-white dark:bg-gray-900 rounded-lg shadow-xl flex flex-col overflow-hidden"
+          style="height: calc(100vh - 24px); max-height: calc(100vh - 24px)"
+        >
+          <!-- Modal header -->
+          <div class="flex items-center justify-between px-3 py-2 border-b border-gray-200 dark:border-gray-700 shrink-0">
+            <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">
+              {{ t('llmPromptLabel') }}
+            </span>
+            <button
+              type="button"
+              @click="showPromptModal = false"
+              class="p-0.5 rounded text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            >
+              <X :size="14" />
+            </button>
+          </div>
+          <!-- Modal body — textarea stretches to fill remaining height -->
+          <div class="p-3 flex flex-col gap-2 flex-1 overflow-hidden">
+            <textarea
+              v-model="localPreset.prompt"
+              :placeholder="t('llmPromptPlaceholder')"
+              class="w-full flex-1 px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+              autofocus
+            />
+            <p class="text-[10px] text-gray-500 dark:text-gray-400 shrink-0">
+              {{ t('llmPromptHint') }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
     <!-- Locked overlay — shown when the preset index exceeds the free limit and user has no Pro access -->
     <div
       v-if="isPresetLocked(presetIndex)"
@@ -450,7 +499,7 @@
 
 <script setup lang="ts">
 import { ref, watch, computed, onMounted } from 'vue'
-import { Check, RotateCcw, Info, Lock } from 'lucide-vue-next'
+import { Check, RotateCcw, Info, Lock, Maximize2, X } from 'lucide-vue-next'
 import { useI18nWrapper } from '@/composables/useI18nWrapper'
 import { usePro } from '@/composables/usePro'
 import {
@@ -536,6 +585,7 @@ const localPreset = ref<Preset>({ ...props.preset })
 const shortcutError = ref('')
 const showDeleteDialog = ref(false)
 const showValidationDialog = ref(false)
+const showPromptModal = ref(false)
 const validationDialogTitle = ref('')
 const validationDialogMessage = ref('')
 

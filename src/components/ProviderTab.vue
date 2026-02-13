@@ -323,7 +323,7 @@
         <!-- Info tooltip explaining the word selection shortcut -->
         <div class="relative group">
           <Info :size="13" class="text-gray-400 dark:text-gray-500 cursor-help" />
-          <div class="absolute bottom-full left-0 mb-1 hidden group-hover:block z-10 w-64">
+          <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block z-10 w-64">
             <div class="bg-gray-900 dark:bg-gray-700 text-white text-[10px] p-2 rounded shadow-lg leading-relaxed">
               {{ t('selectionModifierHelp') }}
             </div>

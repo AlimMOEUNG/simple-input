@@ -11,8 +11,8 @@ export interface ModelOption {
 
 export const PREDEFINED_MODELS = {
   gemini: [
-    { value: 'gemini-2.0-flash-exp', label: 'Gemini 2.0 Flash (Experimental)' },
-    { value: 'gemini-1.5-flash', label: 'Gemini 1.5 Flash (Recommended)' },
+    { value: 'gemini-2.0-flash-exp', label: 'Gemini 2.0 Flash' },
+    { value: 'gemini-1.5-flash', label: 'Gemini 1.5 Flash' },
     { value: 'gemini-1.5-flash-8b', label: 'Gemini 1.5 Flash-8B' },
     { value: 'gemini-1.5-pro', label: 'Gemini 1.5 Pro' },
     { value: 'gemini-pro', label: 'Gemini Pro (Legacy)' },
@@ -20,7 +20,7 @@ export const PREDEFINED_MODELS = {
   ] as ModelOption[],
 
   chatgpt: [
-    { value: 'gpt-4o', label: 'GPT-4o (Recommended)' },
+    { value: 'gpt-4o', label: 'GPT-4o' },
     { value: 'gpt-4o-mini', label: 'GPT-4o Mini' },
     { value: 'gpt-4-turbo', label: 'GPT-4 Turbo' },
     { value: 'gpt-4', label: 'GPT-4' },
@@ -31,7 +31,7 @@ export const PREDEFINED_MODELS = {
   ] as ModelOption[],
 
   groq: [
-    { value: 'llama-3.3-70b-versatile', label: 'Llama 3.3 70B (Recommended)' },
+    { value: 'llama-3.3-70b-versatile', label: 'Llama 3.3 70B' },
     { value: 'llama-3.1-70b-versatile', label: 'Llama 3.1 70B' },
     { value: 'llama-3.1-8b-instant', label: 'Llama 3.1 8B Instant' },
     { value: 'llama3-70b-8192', label: 'Llama 3 70B' },
@@ -44,7 +44,7 @@ export const PREDEFINED_MODELS = {
   openrouter: [
     {
       value: 'meta-llama/llama-3.3-70b-instruct',
-      label: 'Meta Llama 3.3 70B (Recommended)',
+      label: 'Meta Llama 3.3 70B',
     },
     { value: 'anthropic/claude-3.5-sonnet', label: 'Claude 3.5 Sonnet' },
     { value: 'anthropic/claude-3-opus', label: 'Claude 3 Opus' },

@@ -150,7 +150,7 @@
                   :key="model.value"
                   :value="model.value"
                 >
-                  {{ model.label }}
+                  {{ model.isCustom ? t('customModel') : model.label }}
                 </option>
               </select>
 
@@ -317,7 +317,7 @@
               class="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
             >
               <option v-for="model in llmAvailableModels" :key="model.value" :value="model.value">
-                {{ model.label }}
+                {{ model.isCustom ? t('customModel') : model.label }}
               </option>
             </select>
             <!-- Free-text input: shown when 'custom' is selected or provider has no predefined list -->

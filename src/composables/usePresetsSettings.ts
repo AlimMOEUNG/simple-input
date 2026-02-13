@@ -16,6 +16,7 @@ import type {
 import { normalizeShortcut } from '@/core/utils/keyboardUtils'
 import { getDefaultModel } from '@/config/predefinedModels'
 import { usePro } from '@/composables/usePro'
+import { translate as t } from '@/core/utils/i18n'
 
 /**
  * Generate a UUID v4
@@ -65,7 +66,7 @@ function createDefaultPreset(
 ): Preset {
   const basePreset = {
     id: generateUUID(),
-    name: `Preset ${index}`,
+    name: t('presetNameDefault', { params: { index } }),
     keyboardShortcut: generateDefaultShortcut(index),
     createdAt: Date.now(),
   }
@@ -284,7 +285,7 @@ async function loadFromStorage() {
 
       const migratedPreset: TranslationPreset = {
         id: generateUUID(),
-        name: 'Preset 1',
+        name: t('presetNameDefault', { params: { index: 1 } }),
         type: 'translation',
         sourceLang: oldSettings.sourceLang,
         targetLang: oldSettings.targetLang,

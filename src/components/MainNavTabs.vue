@@ -10,7 +10,7 @@
         @click="currentView = 'presets'"
         :class="['main-nav-tab', { active: currentView === 'presets' }]"
       >
-        Presets
+        {{ t('presetsTab') }}
       </button>
 
       <!-- Visual separator hidden when an adjacent tab is active -->
@@ -20,7 +20,7 @@
         @click="currentView = 'provider'"
         :class="['main-nav-tab', { active: currentView === 'provider' }]"
       >
-        Global
+        {{ t('globalTab') }}
       </button>
     </div>
   </div>
@@ -28,9 +28,11 @@
 
 <script setup lang="ts">
 import { usePopupState } from '@/composables/usePopupState'
+import { useI18nWrapper } from '@/composables/useI18nWrapper'
 
 // currentView is reactive and persisted to storage via usePopupState
 const { currentView } = usePopupState()
+const { t } = useI18nWrapper()
 </script>
 
 <style scoped>

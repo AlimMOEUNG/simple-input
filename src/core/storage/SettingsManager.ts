@@ -11,6 +11,7 @@ import type {
   TranslationProvider,
   SelectionModifier,
 } from '@/types/common'
+import { translate as t } from '@/core/utils/i18n'
 
 // Keep these in sync with src/composables/usePro.ts
 const FREE_MAX_PRESETS = 5
@@ -56,7 +57,7 @@ export class SettingsManager {
       presets: [
         {
           id: defaultPresetId,
-          name: 'Preset 1',
+          name: t('presetNameDefault', { params: { index: 1 } }),
           type: 'translation',
           sourceLang: 'auto',
           targetLang: 'en',
@@ -99,7 +100,7 @@ export class SettingsManager {
         // Create first preset from old settings
         const migratedPreset: TranslationPreset = {
           id: generateUUID(),
-          name: 'Preset 1',
+          name: t('presetNameDefault', { params: { index: 1 } }),
           type: 'translation',
           sourceLang: this.settings.sourceLang,
           targetLang: this.settings.targetLang,

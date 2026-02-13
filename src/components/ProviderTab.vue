@@ -59,7 +59,7 @@
         class="w-full px-2 py-1 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
       >
         <option v-for="model in PREDEFINED_MODELS.gemini" :key="model.value" :value="model.value">
-          {{ model.label }}
+          {{ model.isCustom ? t('customModel') : model.label }}
         </option>
       </select>
       <input
@@ -96,7 +96,7 @@
         class="w-full px-2 py-1 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
       >
         <option v-for="model in PREDEFINED_MODELS.chatgpt" :key="model.value" :value="model.value">
-          {{ model.label }}
+          {{ model.isCustom ? t('customModel') : model.label }}
         </option>
       </select>
       <input
@@ -133,7 +133,7 @@
         class="w-full px-2 py-1 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
       >
         <option v-for="model in PREDEFINED_MODELS.groq" :key="model.value" :value="model.value">
-          {{ model.label }}
+          {{ model.isCustom ? t('customModel') : model.label }}
         </option>
       </select>
       <input
@@ -200,7 +200,7 @@
         v-if="!ollamaModelsLoading && !ollamaModelsError && ollamaModels.length === 0"
         class="text-[10px] text-gray-500 dark:text-gray-400"
       >
-        💡 Click ↻ to load your installed Ollama models
+        💡 {{ t('ollamaHint') }}
       </p>
 
       <label class="block text-[10px] font-semibold text-gray-700 dark:text-gray-300">
@@ -211,7 +211,7 @@
         class="w-full px-2 py-1 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
       >
         <option v-for="model in ollamaModelOptions" :key="model.value" :value="model.value">
-          {{ model.label }}
+          {{ model.value === 'custom' ? t('customModel') : model.label }}
         </option>
       </select>
       <input
@@ -252,7 +252,7 @@
           :key="model.value"
           :value="model.value"
         >
-          {{ model.label }}
+          {{ model.isCustom ? t('customModel') : model.label }}
         </option>
       </select>
       <input
@@ -411,7 +411,7 @@ const ollamaModelOptions = computed(() => {
   if (ollamaModels.value.length > 0) {
     return [...ollamaModels.value, { value: 'custom', label: 'Custom Model' }]
   }
-  return [{ value: 'custom', label: 'Custom Model (Click ↻ to load models)' }]
+  return [{ value: 'custom', label: 'Custom Model' }]
 })
 
 // --- Inline sub-components to avoid extra files for simple UI patterns ---

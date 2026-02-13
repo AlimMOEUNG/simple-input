@@ -17,7 +17,11 @@ type TranslationMap = Record<TranslationKey, TranslationValue>
 
 const enTranslations = {
   // App
-  appTitle: 'PowerInput',
+  appTitle: 'Power Input',
+
+  // Tabs
+  presetsTab: 'Presets',
+  globalTab: 'Global',
 
   // Provider
   providerLabel: 'Provider',
@@ -44,6 +48,7 @@ const enTranslations = {
   labelModel: 'Model',
   labelBaseUrl: 'Base URL',
   labelApiKeyOptional: 'API Key (Optional)',
+  customModel: 'Custom Model',
 
   // Placeholders
   placeholderModel: 'model-name',
@@ -57,6 +62,7 @@ const enTranslations = {
   validationLoaded: 'Configuration loaded',
   modelRequired: 'Model name required',
   baseUrlRequired: 'Base URL required',
+  ollamaHint: 'Click ↻ to load your installed Ollama models',
 
   // Languages
   languagesLabel: 'Languages',
@@ -80,6 +86,7 @@ const enTranslations = {
   // Presets
   presetName: 'Preset Name',
   presetNamePlaceholder: 'My Preset',
+  presetNameDefault: 'Preset {index}',
   addPreset: 'Add Preset',
   deletePreset: 'Delete Preset',
   presetDeleteTitle: 'Delete Preset?',
@@ -201,7 +208,9 @@ const enTranslations = {
 export type TranslationKey = keyof typeof enTranslations
 
 const frTranslations: TranslationMap = {
-  appTitle: 'PowerInput',
+  appTitle: 'Power Input',
+  presetsTab: 'Presets',
+  globalTab: 'Global',
   providerLabel: 'Fournisseur',
   providerBuiltin: 'IA intégrée Chrome',
   providerDeepL: 'API DeepL',
@@ -220,6 +229,7 @@ const frTranslations: TranslationMap = {
   labelModel: 'Modèle',
   labelBaseUrl: 'URL de base',
   labelApiKeyOptional: 'Clé API (Optionnel)',
+  customModel: 'Modèle personnalisé',
   placeholderModel: 'nom-du-modèle',
   placeholderBaseUrl: 'https://api.exemple.com/v1',
   placeholderOptional: 'Optionnel',
@@ -228,6 +238,7 @@ const frTranslations: TranslationMap = {
   validationLoaded: 'Configuration chargée',
   modelRequired: 'Nom du modèle requis',
   baseUrlRequired: 'URL de base requise',
+  ollamaHint: 'Cliquez sur ↻ pour charger vos modèles Ollama installés',
   sourceLanguage: 'Langue source',
   sourceLanguageDescription:
     'Sélectionner "Détection auto" pour laisser le fournisseur détecter la langue source',
@@ -241,10 +252,11 @@ const frTranslations: TranslationMap = {
   keyboardShortcut: 'Raccourci clavier',
   keyboardShortcutDescription:
     'Appuyez sur la combinaison de touches souhaitée (ex: Alt+T, Ctrl+Shift+T)',
-  presetName: 'Nom de la triplette',
-  presetNamePlaceholder: 'Ma triplette',
-  addPreset: 'Ajouter une triplette',
-  deletePreset: 'Supprimer la triplette',
+  presetName: 'Nom du preset',
+  presetNamePlaceholder: 'Mon preset',
+  presetNameDefault: 'Preset {index}',
+  addPreset: 'Ajouter un preset',
+  deletePreset: 'Supprimer le preset',
   presetDeleteTitle: 'Delete Preset?',
   presetDeleteMessage: 'Are you sure you want to delete "{name}"? This action cannot be undone.',
   presetDeleteConfirm: 'Êtes-vous sûr de vouloir supprimer "{name}" ?',
@@ -347,7 +359,9 @@ const frTranslations: TranslationMap = {
 }
 
 const esTranslations: TranslationMap = {
-  appTitle: 'PowerInput',
+  appTitle: 'Power Input',
+  presetsTab: 'Presets',
+  globalTab: 'Global',
   providerLabel: 'Proveedor',
   providerBuiltin: 'IA integrada de Chrome',
   providerDeepL: 'API DeepL',
@@ -366,6 +380,7 @@ const esTranslations: TranslationMap = {
   labelModel: 'Modelo',
   labelBaseUrl: 'URL base',
   labelApiKeyOptional: 'Clave API (Opcional)',
+  customModel: 'Modelo personalizado',
   placeholderModel: 'nombre-del-modelo',
   placeholderBaseUrl: 'https://api.ejemplo.com/v1',
   placeholderOptional: 'Opcional',
@@ -374,6 +389,7 @@ const esTranslations: TranslationMap = {
   validationLoaded: 'Configuración cargada',
   modelRequired: 'Nombre del modelo requerido',
   baseUrlRequired: 'URL base requerida',
+  ollamaHint: 'Haga clic en ↻ para cargar sus modelos de Ollama instalados',
   sourceLanguage: 'Idioma de origen',
   sourceLanguageDescription:
     'Seleccione "Detección automática" para que el proveedor detecte el idioma de origen',
@@ -386,9 +402,10 @@ const esTranslations: TranslationMap = {
   translationCustomModelPlaceholder: 'ej: gemini-1.5-flash, gpt-4o-mini',
   keyboardShortcut: 'Atajo de teclado',
   keyboardShortcutDescription:
-    'Presione la combinación de teclas deseada (ej: Alt+T, Ctrl+Shift+T)',
+    'Presione la combination de teclas deseada (ej: Alt+T, Ctrl+Shift+T)',
   presetName: 'Nombre del preset',
   presetNamePlaceholder: 'Mi preset',
+  presetNameDefault: 'Preset {index}',
   addPreset: 'Agregar preset',
   deletePreset: 'Eliminar preset',
   presetDeleteTitle: 'Delete Preset?',
@@ -491,7 +508,9 @@ const esTranslations: TranslationMap = {
 }
 
 const deTranslations: TranslationMap = {
-  appTitle: 'PowerInput',
+  appTitle: 'Power Input',
+  presetsTab: 'Presets',
+  globalTab: 'Global',
   providerLabel: 'Anbieter',
   providerBuiltin: 'Chrome integrierte KI',
   providerDeepL: 'DeepL API',
@@ -510,14 +529,16 @@ const deTranslations: TranslationMap = {
   labelModel: 'Modell',
   labelBaseUrl: 'Basis-URL',
   labelApiKeyOptional: 'API-Schlüssel (Optional)',
+  customModel: 'Benutzerdefiniertes Modell',
   placeholderModel: 'modellname',
   placeholderBaseUrl: 'https://api.beispiel.com/v1',
   placeholderOptional: 'Optional',
   validationSuccess: 'Konfiguration gültig',
-  validationFailed: 'Validierung fehlgeschlagen',
+  validationFailed: 'Validierung fehgeschlagen',
   validationLoaded: 'Konfiguration geladen',
   modelRequired: 'Modellname erforderlich',
   baseUrlRequired: 'Basis-URL erforderlich',
+  ollamaHint: 'Klicken Sie auf ↻, um Ihre installierten Ollama-Modelle zu laden',
   sourceLanguage: 'Quellsprache',
   sourceLanguageDescription:
     'Wählen Sie "Automatische Erkennung", damit der Anbieter die Quellsprache erkennt',
@@ -533,6 +554,7 @@ const deTranslations: TranslationMap = {
     'Drücken Sie die gewünschte Tastenkombination (z.B. Alt+T, Ctrl+Shift+T)',
   presetName: 'Voreinstellungsname',
   presetNamePlaceholder: 'Meine Voreinstellung',
+  presetNameDefault: 'Preset {index}',
   addPreset: 'Voreinstellung hinzufügen',
   deletePreset: 'Voreinstellung löschen',
   presetDeleteTitle: 'Delete Preset?',
@@ -636,7 +658,9 @@ const deTranslations: TranslationMap = {
 }
 
 const zhTranslations: TranslationMap = {
-  appTitle: 'PowerInput',
+  appTitle: 'Power Input',
+  presetsTab: '预设',
+  globalTab: '全局',
   providerLabel: '提供商',
   providerBuiltin: 'Chrome 内置 AI',
   providerDeepL: 'DeepL API',
@@ -655,6 +679,7 @@ const zhTranslations: TranslationMap = {
   labelModel: '模型',
   labelBaseUrl: '基础 URL',
   labelApiKeyOptional: 'API 密钥（可选）',
+  customModel: '自定义模型',
   placeholderModel: '模型名称',
   placeholderBaseUrl: 'https://api.example.com/v1',
   placeholderOptional: '可选',
@@ -663,6 +688,7 @@ const zhTranslations: TranslationMap = {
   validationLoaded: '配置已加载',
   modelRequired: '需要模型名称',
   baseUrlRequired: '需要基础 URL',
+  ollamaHint: '点击 ↻ 加载已安装的 Ollama 模型',
   sourceLanguage: '源语言',
   sourceLanguageDescription: '选择"自动检测"让提供商检测源语言',
   targetLanguage: '目标语言',
@@ -676,6 +702,7 @@ const zhTranslations: TranslationMap = {
   keyboardShortcutDescription: '按下所需的键盘组合（例如：Alt+T, Ctrl+Shift+T）',
   presetName: '预设名称',
   presetNamePlaceholder: '我的预设',
+  presetNameDefault: '预设 {index}',
   addPreset: '添加预设',
   deletePreset: '删除预设',
   presetDeleteTitle: 'Delete Preset?',
@@ -774,7 +801,9 @@ const zhTranslations: TranslationMap = {
 }
 
 const jaTranslations: TranslationMap = {
-  appTitle: 'PowerInput',
+  appTitle: 'Power Input',
+  presetsTab: 'プリセット',
+  globalTab: 'グローバル',
   providerLabel: 'プロバイダー',
   providerBuiltin: 'Chrome 内蔵 AI',
   providerDeepL: 'DeepL API',
@@ -793,6 +822,7 @@ const jaTranslations: TranslationMap = {
   labelModel: 'モデル',
   labelBaseUrl: 'ベース URL',
   labelApiKeyOptional: 'API キー（オプション）',
+  customModel: 'カスタムモデル',
   placeholderModel: 'モデル名',
   placeholderBaseUrl: 'https://api.example.com/v1',
   placeholderOptional: 'オプション',
@@ -801,6 +831,7 @@ const jaTranslations: TranslationMap = {
   validationLoaded: '設定が読み込まれました',
   modelRequired: 'モデル名が必要です',
   baseUrlRequired: 'ベース URL が必要です',
+  ollamaHint: '↻をクリックしてインストール済みのOllamaモデルを読み込む',
   sourceLanguage: 'ソース言語',
   sourceLanguageDescription: 'プロバイダーにソース言語を検出させるには「自動検出」を選択',
   targetLanguage: 'ターゲット言語',
@@ -815,6 +846,7 @@ const jaTranslations: TranslationMap = {
     '希望のキーボード組み合わせを押してください（例：Alt+T, Ctrl+Shift+T）',
   presetName: 'プリセット名',
   presetNamePlaceholder: 'マイプリセット',
+  presetNameDefault: 'プリセット {index}',
   addPreset: 'プリセットを追加',
   deletePreset: 'プリセットを削除',
   presetDeleteTitle: 'Delete Preset?',

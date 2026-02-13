@@ -17,6 +17,7 @@ import { normalizeShortcut } from '@/core/utils/keyboardUtils'
 import { getDefaultModel } from '@/config/predefinedModels'
 import { usePro } from '@/composables/usePro'
 import { translate as t } from '@/core/utils/i18n'
+import { createOnboardingPresetsSettings } from '@/config/defaultPresets'
 
 /**
  * Generate a UUID v4
@@ -104,17 +105,12 @@ function createDefaultPreset(
 }
 
 /**
- * Get default presets settings (single preset)
+ * Get default presets settings — delegates to the shared onboarding factory.
+ * Used as an in-memory fallback before storage loads, and as a reset target on
+ * invalid data. The authoritative first-run write happens in background.ts onInstalled.
  */
 function getDefaultPresetsSettings(): PresetsSettings {
-  const defaultPreset = createDefaultPreset(1)
-
-  return {
-    presets: [defaultPreset],
-    activePresetId: defaultPreset.id,
-    provider: 'google',
-    pinnedPresetId: defaultPreset.id, // First preset is pinned by default for context menu
-  }
+  return createOnboardingPresetsSettings()
 }
 
 // Shared state

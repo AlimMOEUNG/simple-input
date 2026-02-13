@@ -5,6 +5,7 @@
  */
 
 import type { Preset, PresetsSettings } from '@/types/common'
+import { createOnboardingPresetsSettings } from '@/config/defaultPresets'
 
 // Message types for API proxy and context menu
 type BackgroundMessage =
@@ -97,19 +98,20 @@ async function updateContextMenuTitle(): Promise<void> {
 setupContextMenu()
 
 // Initialize default settings on install
-chrome.runtime.onInstalled.addListener((details) => {
+chrome.runtime.onInstalled.addListener(async (details) => {
   if (details.reason === 'install') {
-    console.log('[Background] Extension installed')
-    chrome.storage.sync.set({
-      settings: {
-        sourceLang: 'auto',
-        targetLang: 'en',
-        provider: 'google', // Default to Google Translate (free, no API key)
-        keyboardShortcut: 'Ctrl+Alt+T',
-      },
+    console.log('[Background] Extension installed — writing onboarding presets')
+
+    // Write the onboarding presets synchronously before the popup can open,
+    // so loadFromStorage() always hits Case 1 (existing data) on first open.
+    const defaultSettings = createOnboardingPresetsSettings()
+    await chrome.storage.sync.set({
+      presetsSettings: defaultSettings,
       themeMode: 'auto',
       locale: 'en',
     })
+
+    console.log('[Background] Onboarding presets written to storage')
   }
 
   // Recreate context menu on install/update

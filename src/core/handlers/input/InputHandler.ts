@@ -262,10 +262,23 @@ export class InputHandler {
     element: HTMLElement,
     text: string
   ): Promise<boolean> {
+    // Capture length before any insertion attempt for normalization-safe verification.
+    // contenteditable editors (e.g. Gemini) normalize newlines (\n\n → \n via <p> elements),
+    // so includes(text) can return false even though insertion succeeded.
+    // A length change is sufficient proof that replacement happened.
+    const textBefore = this.getCurrentText(element)
+
+    const verifyInsertion = (): boolean => {
+      const current = this.getCurrentText(element)
+      if (current.includes(text)) return true // exact match (standard inputs, short texts)
+      if (current.length !== textBefore.length) return true // length changed = replacement happened (long/formatted texts)
+      return false
+    }
+
     // Method 1: execCommand('insertText') — works for standard inputs + Slate.js via beforeinput
     if (this.tryExecCommand(element, text)) {
       await delay(100)
-      if (this.getCurrentText(element).includes(text)) {
+      if (verifyInsertion()) {
         console.log('[InputHandler] Inserted via execCommand')
         await this.syncContentEditable(element)
         return true
@@ -277,7 +290,7 @@ export class InputHandler {
     // Method 2: Synthetic ClipboardEvent — catches editors that listen on paste
     if (this.tryClipboardEvent(element, text)) {
       await delay(100)
-      if (this.getCurrentText(element).includes(text)) {
+      if (verifyInsertion()) {
         console.log('[InputHandler] Inserted via ClipboardEvent')
         await this.syncContentEditable(element)
         return true
@@ -289,7 +302,7 @@ export class InputHandler {
     // Method 3: InputEvent only — last resort for frameworks handling insertText natively
     if (this.tryInputEvent(element, text)) {
       await delay(100)
-      if (this.getCurrentText(element).includes(text)) {
+      if (verifyInsertion()) {
         console.log('[InputHandler] Inserted via InputEvent')
         await this.syncContentEditable(element)
         return true

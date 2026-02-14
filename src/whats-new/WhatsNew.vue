@@ -238,10 +238,9 @@
           <p class="text-sm text-gray-500 dark:text-gray-400">{{ t('surveyDescription') }}</p>
         </div>
         <iframe
-          ref="surveyIframe"
           src="https://tally.so/embed/9qDkWK?alignLeft=1&hideTitle=1&transparentBackground=1"
           width="100%"
-          height="0"
+          height="440"
           frameborder="0"
           marginheight="0"
           marginwidth="0"
@@ -457,7 +456,6 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { iframeResize } from 'iframe-resizer'
 import { changelog, featureSummary, getCurrentVersion } from '../data/changelog'
 import { useI18nWrapper } from '../composables/useI18nWrapper'
 import { useThemeMode } from '../composables/useThemeMode'
@@ -477,20 +475,12 @@ const isFromUpdate = ref(false)
 const oldVersion = ref('unknown')
 const newVersion = ref(getCurrentVersion())
 
-// Survey iframe auto-resize using iFrameResizer (same lib Tally uses internally)
-const surveyIframe = ref<HTMLIFrameElement | null>(null)
-
 onMounted(() => {
   // Read update context from URL params
   const params = new URLSearchParams(window.location.search)
   isFromUpdate.value = params.get('fromUpdate') === 'true'
   oldVersion.value = params.get('oldVersion') ?? 'unknown'
   newVersion.value = params.get('newVersion') ?? getCurrentVersion()
-
-  // Auto-resize the Tally survey iframe
-  if (surveyIframe.value) {
-    iframeResize({ checkOrigin: false }, surveyIframe.value)
-  }
 })
 
 // Logo loaded from extension resources

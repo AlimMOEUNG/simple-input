@@ -1,11 +1,11 @@
 {
   "actionTitle": {
-    "message": "PowerInput : መተርጎም እና መለወጥ"
+    "message": "PowerInput : በAI ይተርጉሙ እና ይለውጡ"
   },
   "extensionDescription": {
     "message": "እየተየቡ እያለ ጽሑፍን ለመተርጎም፣ እንደገና ለመጻፍ እና ለማሳመር የሚያገለግሉ የቁልፍ ሰሌዳ አቋራጮች። ቅጂ-ለጥፍ የለም፣ ሙሉ በሙሉ ሊበጁ የሚችሉ ቅድመ-ቅንብሮች።"
   },
   "extensionName": {
-    "message": "PowerInput : መተርጎም እና መለወጥ"
+    "message": "PowerInput : በAI ይተርጉሙ እና ይለውጡ"
   }
 }

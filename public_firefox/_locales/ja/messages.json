@@ -1,11 +1,11 @@
 {
   "actionTitle": {
-    "message": "PowerInput : 入力を翻訳・変換"
+    "message": "PowerInput: AIで翻訳・書き換え・装飾"
   },
   "extensionDescription": {
     "message": "入力場所で直接テキストを翻訳、書き換え、スタイル変更できるキーボードショートカット。コピペ不要、完全にカスタマイズ可能なプリセット。"
   },
   "extensionName": {
-    "message": "PowerInput : 入力を翻訳・変換"
+    "message": "PowerInput: AIで翻訳・書き換え・装飾"
   }
 }

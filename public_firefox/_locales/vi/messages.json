@@ -1,11 +1,11 @@
 {
   "actionTitle": {
-    "message": "PowerInput : Dịch & Chuyển đổi"
+    "message": "PowerInput: Dịch & Tạo kiểu bằng AI"
   },
   "extensionDescription": {
     "message": "Phím tắt để dịch, viết lại và tạo kiểu cho bất kỳ văn bản nào trực tiếp tại nơi bạn nhập. Không cần sao chép-dán, cài đặt trước hoàn toàn có thể tùy chỉnh."
   },
   "extensionName": {
-    "message": "PowerInput : Dịch & Chuyển đổi"
+    "message": "PowerInput: Dịch & Tạo kiểu bằng AI"
   }
 }

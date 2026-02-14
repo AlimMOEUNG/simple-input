@@ -1,11 +1,11 @@
 {
   "actionTitle": {
-    "message": "PowerInput : แปลและแปลงอินพุต"
+    "message": "PowerInput: แปลและจัดสไตล์ด้วย AI"
   },
   "extensionDescription": {
     "message": "แป้นพิมพ์ลัดเพื่อแปล เขียนใหม่ และจัดรูปแบบข้อความโดยตรงในตำแหน่งที่คุณพิมพ์ ไม่มีการคัดลอกวาง ค่าที่ตั้งล่วงหน้าปรับแต่งได้เต็มที่"
   },
   "extensionName": {
-    "message": "PowerInput : แปลและแปลงอินพุต"
+    "message": "PowerInput: แปลและจัดสไตล์ด้วย AI"
   }
 }

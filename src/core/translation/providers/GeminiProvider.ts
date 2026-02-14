@@ -9,6 +9,12 @@
 
 import { BaseTranslationProvider, TranslationOptions } from './BaseTranslationProvider'
 
+interface GeminiCandidatesResponse {
+  candidates?: Array<{
+    content?: { parts?: Array<{ text?: string }> }
+  }>
+}
+
 // Gemini REST API endpoint
 const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models'
 
@@ -37,7 +43,7 @@ export class GeminiProvider extends BaseTranslationProvider {
    */
   private async makeGeminiRequest(
     prompt: string
-  ): Promise<{ success: boolean; data?: any; error?: string }> {
+  ): Promise<{ success: boolean; data?: Record<string, unknown>; error?: string }> {
     // Send request via background script (CORS bypass)
     return await chrome.runtime.sendMessage({
       type: 'PROXY_FETCH',
@@ -99,7 +105,7 @@ export class GeminiProvider extends BaseTranslationProvider {
       }
 
       // Extract translation from response
-      const translation = response.data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
+      const translation = (response.data as GeminiCandidatesResponse)?.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
 
       if (!translation) {
         throw new Error('Empty response from Gemini API')

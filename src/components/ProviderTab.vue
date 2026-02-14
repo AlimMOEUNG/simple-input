@@ -318,8 +318,12 @@
         </label>
         <!-- Info tooltip explaining the word selection shortcut -->
         <Info :size="13" class="text-gray-400 dark:text-gray-500 cursor-help" />
-        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block z-10 w-64 pointer-events-none">
-          <div class="bg-gray-900 dark:bg-gray-700 text-white text-[10px] p-2 rounded shadow-lg leading-relaxed text-center">
+        <div
+          class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block z-10 w-64 pointer-events-none"
+        >
+          <div
+            class="bg-gray-900 dark:bg-gray-700 text-white text-[10px] p-2 rounded shadow-lg leading-relaxed text-center"
+          >
             {{ t('selectionModifierHelp') }}
           </div>
         </div>

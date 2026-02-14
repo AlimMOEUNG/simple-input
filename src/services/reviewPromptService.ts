@@ -103,9 +103,7 @@ export async function markAsRejected(): Promise<void> {
  * @returns Review URL for Chrome Web Store or Firefox Add-ons
  */
 export function getReviewUrl(): string {
-  const isFirefox =
-    typeof (globalThis as any).browser !== 'undefined' &&
-    (globalThis as any).browser.runtime !== undefined
+  const isFirefox = typeof browser !== 'undefined' && browser?.runtime !== undefined
 
   if (isFirefox) {
     // TODO: Replace with your Firefox Add-on URL

@@ -456,7 +456,9 @@
           style="height: calc(100vh - 24px); max-height: calc(100vh - 24px)"
         >
           <!-- Modal header -->
-          <div class="flex items-center justify-between px-3 py-2 border-b border-gray-200 dark:border-gray-700 shrink-0">
+          <div
+            class="flex items-center justify-between px-3 py-2 border-b border-gray-200 dark:border-gray-700 shrink-0"
+          >
             <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">
               {{ t('llmPromptLabel') }}
             </span>
@@ -738,7 +740,9 @@ function restoreDraftFromCache(presetId: string) {
   if (draft.presetId !== presetId) return
   if (!draft.localPreset || typeof draft.localPreset.type !== 'string') {
     memoryCachedDraft.value = null
-    clearDraft().catch((e) => console.error('[PresetEditor] Failed to clear invalid cached draft:', e))
+    clearDraft().catch((e) =>
+      console.error('[PresetEditor] Failed to clear invalid cached draft:', e)
+    )
     return
   }
   applyDraft(draft)

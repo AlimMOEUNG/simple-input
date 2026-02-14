@@ -12,6 +12,7 @@ import {
   GoogleTranslateProvider,
   OpenAICompatibleProvider,
   OpenAIConfig,
+  OpenAIProviderType,
   getDefaultEndpoint,
 } from './providers'
 import { getEffectiveModel } from '@/config/predefinedModels'
@@ -128,8 +129,8 @@ export class TranslationEngine {
         const effectiveModel = getEffectiveModel(config.model, config.customModel)
 
         const openaiConfig: OpenAIConfig = {
-          providerType: providerType as any,
-          baseUrl: config.baseUrl || getDefaultEndpoint(providerType as any),
+          providerType: providerType as OpenAIProviderType,
+          baseUrl: config.baseUrl || getDefaultEndpoint(providerType as OpenAIProviderType),
           apiKey: config.apiKey,
           model: effectiveModel,
         }

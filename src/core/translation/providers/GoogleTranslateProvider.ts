@@ -56,9 +56,9 @@ export class GoogleTranslateProvider extends BaseTranslationProvider {
       }
 
       // Extract translated text from first array element
-      const translatedText = data[0]
-        .map((item: any) => item[0])
-        .filter((item: any) => item)
+      const translatedText = (data[0] as unknown[])
+        .map((item) => (Array.isArray(item) ? (item[0] as string) : ''))
+        .filter((item) => item)
         .join('')
 
       if (!translatedText) {

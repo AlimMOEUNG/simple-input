@@ -3,10 +3,7 @@
  */
 
 export function isFirefox(): boolean {
-  return (
-    typeof (globalThis as any).browser !== 'undefined' &&
-    (globalThis as any).browser.runtime !== undefined
-  )
+  return typeof browser !== 'undefined' && browser?.runtime !== undefined
 }
 
 export function isChrome(): boolean {

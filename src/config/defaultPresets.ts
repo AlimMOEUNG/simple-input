@@ -3,7 +3,12 @@
  * Called on first install (onInstalled event) and as composable fallback.
  */
 
-import type { TranslationPreset, TransformationPreset, LLMPromptPreset, PresetsSettings } from '@/types/common'
+import type {
+  TranslationPreset,
+  TransformationPreset,
+  LLMPromptPreset,
+  PresetsSettings,
+} from '@/types/common'
 import { getDefaultModel } from '@/config/predefinedModels'
 
 // ---------------------------------------------------------------------------

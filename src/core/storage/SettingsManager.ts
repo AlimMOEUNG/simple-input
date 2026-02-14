@@ -259,7 +259,7 @@ export class SettingsManager {
       // Update first preset only if it's a translation preset
       const firstPreset = this.presetsSettings.presets[0]
       if (firstPreset.type === 'translation') {
-        ;(firstPreset[key as keyof TranslationPreset] as any) = value
+        ;(firstPreset as unknown as Record<string, unknown>)[key] = value
       }
     }
   }

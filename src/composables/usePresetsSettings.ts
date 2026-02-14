@@ -144,55 +144,55 @@ async function saveToStorage() {
 /**
  * Migrate preset to typed format (add type field if missing)
  */
-function migratePresetToTyped(preset: any): Preset {
+function migratePresetToTyped(preset: Record<string, unknown>): Preset {
   // If preset already has type field, it's already migrated
   if (
     'type' in preset &&
+    typeof preset.type === 'string' &&
     ['translation', 'transformation', 'custom-transform', 'llm-prompt'].includes(preset.type)
   ) {
-    return preset as Preset
+    return preset as unknown as Preset
   }
 
   // Legacy preset without type → assume translation preset
   return {
     ...preset,
     type: 'translation',
-  } as TranslationPreset
+  } as unknown as TranslationPreset
 }
 
 /**
  * Validate individual preset structure based on type
  */
-function isValidPreset(preset: any): preset is Preset {
+function isValidPreset(preset: unknown): preset is Preset {
+  if (typeof preset !== 'object' || preset === null) return false
+  const p = preset as Record<string, unknown>
+
   // Base validation: all presets must have these fields
   const hasBaseFields =
-    preset &&
-    typeof preset === 'object' &&
-    typeof preset.id === 'string' &&
-    typeof preset.name === 'string' &&
-    typeof preset.keyboardShortcut === 'string' &&
-    typeof preset.createdAt === 'number'
+    typeof p.id === 'string' &&
+    typeof p.name === 'string' &&
+    typeof p.keyboardShortcut === 'string' &&
+    typeof p.createdAt === 'number'
 
-  if (!hasBaseFields) {
-    return false
-  }
+  if (!hasBaseFields) return false
 
   // Type-specific validation
-  if (preset.type === 'translation') {
+  if (p.type === 'translation') {
     // Translation presets require sourceLang and targetLang
-    return typeof preset.sourceLang === 'string' && typeof preset.targetLang === 'string'
-  } else if (preset.type === 'transformation') {
+    return typeof p.sourceLang === 'string' && typeof p.targetLang === 'string'
+  } else if (p.type === 'transformation') {
     // Transformation presets require transformationStyle
-    return typeof preset.transformationStyle === 'string'
-  } else if (preset.type === 'custom-transform') {
+    return typeof p.transformationStyle === 'string'
+  } else if (p.type === 'custom-transform') {
     // Custom transform presets require customTransformId
-    return typeof preset.customTransformId === 'string'
-  } else if (preset.type === 'llm-prompt') {
+    return typeof p.customTransformId === 'string'
+  } else if (p.type === 'llm-prompt') {
     // LLM prompt presets require prompt, llmProvider, llmModel
     return (
-      typeof preset.prompt === 'string' &&
-      typeof preset.llmProvider === 'string' &&
-      typeof preset.llmModel === 'string'
+      typeof p.prompt === 'string' &&
+      typeof p.llmProvider === 'string' &&
+      typeof p.llmModel === 'string'
     )
   }
 
@@ -203,27 +203,32 @@ function isValidPreset(preset: any): preset is Preset {
 /**
  * Validate presets settings structure
  */
-function isValidPresetsSettings(data: any): data is PresetsSettings {
+function isValidPresetsSettings(data: unknown): data is PresetsSettings {
+  if (typeof data !== 'object' || data === null) {
+    console.warn('[usePresetsSettings] Invalid data structure: not an object', { data })
+    return false
+  }
+
+  const d = data as Record<string, unknown>
+  const presets = Array.isArray(d.presets) ? (d.presets as unknown[]) : undefined
+
   const isValid =
-    data &&
-    typeof data === 'object' &&
-    Array.isArray(data.presets) &&
-    data.presets.length > 0 &&
-    data.presets.every((p: any) => isValidPreset(p)) &&
-    typeof data.activePresetId === 'string' &&
-    typeof data.provider === 'string'
+    presets !== undefined &&
+    presets.length > 0 &&
+    presets.every((p: unknown) => isValidPreset(p)) &&
+    typeof d.activePresetId === 'string' &&
+    typeof d.provider === 'string'
 
   if (!isValid) {
     console.warn('[usePresetsSettings] Invalid data structure:', {
-      hasData: !!data,
-      isObject: typeof data === 'object',
-      hasPresets: data?.presets !== undefined,
-      isPresetsArray: Array.isArray(data?.presets),
-      presetsLength: data?.presets?.length,
-      presetsValid: data?.presets?.every((p: any) => isValidPreset(p)),
-      activePresetIdType: typeof data?.activePresetId,
-      providerType: typeof data?.provider,
-      data: data,
+      hasData: true,
+      hasPresets: d.presets !== undefined,
+      isPresetsArray: Array.isArray(d.presets),
+      presetsLength: presets?.length,
+      presetsValid: presets?.every((p: unknown) => isValidPreset(p)),
+      activePresetIdType: typeof d.activePresetId,
+      providerType: typeof d.provider,
+      data,
     })
   }
 
@@ -250,7 +255,9 @@ async function loadFromStorage() {
         presetsSettings.value = migratedData
 
         // Backfill pinnedPresetId if missing (migration for existing users)
-        let needsSave = result.presetsSettings.presets.some((p: any) => !('type' in p))
+        let needsSave = result.presetsSettings.presets.some(
+          (p: unknown) => !(typeof p === 'object' && p !== null && 'type' in p),
+        )
         if (
           presetsSettings.value.pinnedPresetId === undefined ||
           presetsSettings.value.pinnedPresetId === null

@@ -357,6 +357,7 @@ const frTranslations: TranslationMap = {
   proClose: 'Fermer',
   presetLockedTooltip: 'Verrouillé — passez à la version Pro pour modifier ce preset',
   presetLockedMessage: 'Ce preset est verrouillé. Passez à la version Pro pour y accéder.',
+  expandPrompt: "Expandre l'éditeur de texte",
 }
 
 const esTranslations: TranslationMap = {
@@ -506,6 +507,7 @@ const esTranslations: TranslationMap = {
   proClose: 'Cerrar',
   presetLockedTooltip: 'Bloqueado — actualice a Pro para editar este preset',
   presetLockedMessage: 'Este preset está bloqueado. Actualice a Pro para acceder a él.',
+  expandPrompt: 'Ampliar editor de indicaciones',
 }
 
 const deTranslations: TranslationMap = {
@@ -656,6 +658,7 @@ const deTranslations: TranslationMap = {
   proClose: 'Schließen',
   presetLockedTooltip: 'Gesperrt — Upgrade auf Pro, um dieses Preset zu bearbeiten',
   presetLockedMessage: 'Dieses Preset ist gesperrt. Upgrade auf Pro, um darauf zuzugreifen.',
+  expandPrompt: 'Prompt-Editor erweitern',
 }
 
 const zhTranslations: TranslationMap = {
@@ -799,6 +802,7 @@ const zhTranslations: TranslationMap = {
   proClose: '关闭',
   presetLockedTooltip: '已锁定 — 升级到 Pro 以编辑此预设',
   presetLockedMessage: '此预设已锁定。升级到 Pro 以访问它。',
+  expandPrompt: '展开提示编辑器',
 }
 
 const jaTranslations: TranslationMap = {
@@ -948,6 +952,7 @@ const jaTranslations: TranslationMap = {
   presetLockedTooltip: 'ロック済み — このプリセットを編集するにはProにアップグレードしてください',
   presetLockedMessage:
     'このプリセットはロックされています。アクセスするにはProにアップグレードしてください。',
+  expandPrompt: 'プロンプトエディターを展開',
 }
 
 const translations: Record<SupportedLocale, TranslationMap> = {

@@ -243,7 +243,7 @@ import { ref, computed, onMounted } from 'vue'
 import { Sun, Moon, Monitor, Plus, Trash2 } from 'lucide-vue-next'
 import { useI18nWrapper } from '@/composables/useI18nWrapper'
 import { useThemeMode } from '@/composables/useThemeMode'
-import type { CustomTransformation } from '@/types/common'
+import type { CustomTransformation, TransformationStyle } from '@/types/common'
 import {
   getAllCustomTransforms,
   createCustomTransform,
@@ -282,7 +282,7 @@ const editorState = ref<{
 })
 
 // Pre-populate dropdown selection
-const selectedBaseStyle = ref('')
+const selectedBaseStyle = ref<TransformationStyle | ''>()
 
 // Live preview input text
 const previewInput = ref('Type to preview...')
@@ -390,7 +390,7 @@ async function executeDelete() {
 function loadBaseStyle() {
   if (!selectedBaseStyle.value) return
 
-  const charMap = generateCharMapForStyle(selectedBaseStyle.value as any)
+  const charMap = generateCharMapForStyle(selectedBaseStyle.value as TransformationStyle)
   editorState.value.charMap = Object.entries(charMap).map(([source, target]) => ({
     source,
     target,
@@ -431,14 +431,14 @@ async function saveTransform() {
       await createCustomTransform({
         name,
         charMap,
-        baseStyle: (selectedBaseStyle.value as any) || undefined,
+        baseStyle: selectedBaseStyle.value || undefined,
       })
     } else {
       // Update existing
       await updateCustomTransform(editingId.value!, {
         name,
         charMap,
-        baseStyle: (selectedBaseStyle.value as any) || undefined,
+        baseStyle: selectedBaseStyle.value || undefined,
       })
     }
 

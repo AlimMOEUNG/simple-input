@@ -5,8 +5,6 @@
 
 // Use browser namespace if available (Firefox), otherwise use chrome namespace (Chrome)
 export const browserAPI =
-  typeof (globalThis as any).browser !== 'undefined' && (globalThis as any).browser.runtime
-    ? (globalThis as any).browser
-    : chrome
+  typeof browser !== 'undefined' && browser?.runtime ? browser : chrome
 
 export default browserAPI

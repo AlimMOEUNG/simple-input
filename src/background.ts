@@ -20,7 +20,9 @@ type BackgroundMessage =
       type: 'TRIGGER_PINNED_PRESET'
     }
 
-type BackgroundResponse = { success: true; data?: any } | { success: false; error: string }
+type BackgroundResponse =
+  | { success: true; data?: Record<string, unknown> | string }
+  | { success: false; error: string }
 
 // Context menu item ID for the pinned preset action
 const CONTEXT_MENU_ID = 'translate-pinned-preset'
@@ -188,10 +190,10 @@ async function handleProxyFetch(message: {
 
     // Parse response based on content type
     const contentType = response.headers.get('content-type')
-    let data: any
+    let data: Record<string, unknown> | string
 
     if (contentType?.includes('application/json')) {
-      data = await response.json()
+      data = (await response.json()) as Record<string, unknown>
     } else {
       data = await response.text()
     }

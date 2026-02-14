@@ -9,6 +9,10 @@
 
 import { BaseTranslationProvider, TranslationOptions } from './BaseTranslationProvider'
 
+interface DeepLTranslationsResponse {
+  translations: Array<{ text: string }>
+}
+
 // DeepL API endpoints
 const DEEPL_ENDPOINTS = {
   free: 'https://api-free.deepl.com/v2/translate',
@@ -40,7 +44,7 @@ export class DeepLProvider extends BaseTranslationProvider {
     endpoint: string,
     text: string,
     targetLang: string
-  ): Promise<{ success: boolean; data?: any; error?: string }> {
+  ): Promise<{ success: boolean; data?: Record<string, unknown>; error?: string }> {
     // Build request params
     const params = new URLSearchParams({
       text,
@@ -83,7 +87,7 @@ export class DeepLProvider extends BaseTranslationProvider {
         const response = await this.makeDeepLRequest(endpoint, text, targetLanguage)
 
         if (response.success && response.data) {
-          const translation = response.data.translations[0].text
+          const translation = (response.data as unknown as DeepLTranslationsResponse).translations[0].text
 
           console.log('[DeepL] Translation successful')
           return translation

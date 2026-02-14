@@ -100,8 +100,16 @@ async function updateContextMenuTitle(): Promise<void> {
 // Setup context menu at module level (handles SW restarts in MV3)
 setupContextMenu()
 
+// Set the uninstall survey URL (English-only Tally form)
+function setUninstallUrl() {
+  chrome.runtime.setUninstallURL('https://tally.so/r/power-input-uninstall')
+}
+
 // Initialize default settings on install
 chrome.runtime.onInstalled.addListener(async (details) => {
+  // Always refresh the uninstall survey URL
+  setUninstallUrl()
+
   if (details.reason === 'install') {
     console.log('[Background] Extension installed — writing onboarding presets')
 
@@ -115,6 +123,11 @@ chrome.runtime.onInstalled.addListener(async (details) => {
     })
 
     console.log('[Background] Onboarding presets written to storage')
+
+    // Open the What's New / welcome page on first install
+    const welcomeUrl = chrome.runtime.getURL('src/whats-new/whats-new.html')
+    chrome.tabs.create({ url: welcomeUrl })
+    console.log("[Background] First install — opened What's New page")
   }
 
   // Recreate context menu on install/update

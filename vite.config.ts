@@ -110,10 +110,15 @@ export default defineConfig(({ mode }) => {
         'content-script': resolve(__dirname, 'src/content-script.ts'),
         popup: resolve(__dirname, 'src/popup/popup.html'),
         options: resolve(__dirname, 'src/options/options.html'),
+        'whats-new': resolve(__dirname, 'src/whats-new/whats-new.html'),
       },
       output: {
         entryFileNames: '[name].js',
-        chunkFileNames: '[name].js',
+        chunkFileNames: (chunkInfo) => {
+          // Remove underscore prefix — Chrome forbids files starting with "_"
+          const name = chunkInfo.name.replace(/^_/, '')
+          return `${name}.js`
+        },
         assetFileNames: '[name].[ext]'
       }
     }

@@ -202,8 +202,109 @@ const enTranslations = {
   proUpgradeButton: 'Upgrade to Pro',
   proUpgradeComingSoon: '(coming soon)',
   proClose: 'Close',
-  presetLockedTooltip: 'Locked — upgrade to Pro to edit this preset',
+  presetLockedTooltip: 'Locked. Upgrade to Pro to edit this preset',
   presetLockedMessage: 'This preset is locked. Upgrade to Pro to access it.',
+
+  // What's New page — header & tabs
+  whatsNewTitle: "What's New",
+  whatsNewCurrentVersion: 'Version {version}',
+  whatsNewViewUpdates: 'Updates',
+  whatsNewViewFeatures: 'Features',
+  whatsNewRateExtension: 'Rate Extension',
+  whatsNewLatestVersion: 'Latest',
+
+  // What's New page — roadmap
+  whatsNewRoadmapTitle: "What's Next",
+  whatsNewRoadmapBadge: 'Ideas',
+  whatsNewRoadmapItem1: 'More LLM providers & smarter model auto-discovery',
+  whatsNewRoadmapItem2: 'Preset sharing & import/export',
+  whatsNewRoadmapItem3: 'Batch translation for entire pages',
+  whatsNewRoadmapItem4: 'Pro plan: managed API keys, no setup required',
+  whatsNewRoadmapDisclaimer:
+    'These are ideas, not commitments. Whether they ship depends entirely on what you ask for. So tell me what matters to you.',
+  whatsNewRoadmapCtaLabel: 'Share your ideas or report a bug',
+
+  // Update context modal (shown when whats-new opens after a major/minor update)
+  updateModalTitle: 'Power Input just got better!',
+  updateModalFirstUse: 'This is your first use since the update.',
+  updateModalPurpose:
+    'This page keeps you informed of new features, improvements, and bug fixes. Below, you will find all the updates organized by version.',
+  updateModalReassurance:
+    "Don't worry! This page opened automatically for the update. The extension still works normally. Just click the extension icon again to use it as usual.",
+  updateModalGotIt: "Got it. Show me what's new",
+
+  // What's New page — freemium banner
+  freemiumTitle: 'Free & open to everyone',
+  freemiumBadge: 'Freemium',
+  freemiumPoint1: 'All translation & transformation modes unlocked',
+  freemiumPoint2: 'All LLM providers available (DeepL, Gemini, OpenAI…)',
+  freemiumPoint3: 'Custom text transformations in Options',
+  freemiumPoint4: 'All customization options (languages, shortcuts, context menu…)',
+  freemiumLimitText:
+    'One soft limit: the number of presets is capped for free users. Power users can unlock more (unlimited) via a beta code and a Pro plan is coming.',
+
+  // What's New page — subscription survey
+  surveyTitle: 'Help us shape the future of Power Input',
+  surveyDescription:
+    'Would you be interested in a monthly subscription that handles API keys for you. No setup, just works?',
+
+  // Popup header — rotating ticker CTAs
+  tickerWhatsNew: "What's new",
+  tickerRateUs: 'Rate us',
+  tickerFeedback: 'Bug/Feature?',
+
+  // All-extensions cross-promo banner (popup footer)
+  allExtensionsBannerTitle: 'More free extensions by Subtiltee',
+  allExtensionsBannerDesc: 'Translators for WhatsApp, Discord, Reddit & more',
+  allExtensionsBannerCta: 'See all extensions',
+
+  // All-extensions link at bottom of What's New page
+  allExtensionsPromoTitle: 'More free extensions by Subtiltee',
+  allExtensionsPromoDesc: 'Translators for WhatsApp, Discord, Reddit & subtitle downloader',
+
+  // Changelog entries — v1.0.0
+  changelogV100TranslationPresets:
+    'Translation presets with configurable source & target languages',
+  changelogV100Providers: 'Support for DeepL, Gemini, OpenAI, Groq, OpenRouter & more',
+  changelogV100LlmPrompt: 'LLM Prompt preset mode for custom AI transformations',
+  changelogV100Unicode: 'Fun Unicode text transformers (bold, italic, cursive…)',
+  changelogV100ContextMenu: 'Right-click context menu for quick pinned-preset access',
+  changelogV100Shortcuts: 'Keyboard shortcuts per preset (e.g. Alt+T)',
+  changelogV100WordSelection: 'Word-by-word selection modifier (Modifier + Arrow keys)',
+  changelogV100CustomTransform: 'Custom text transformation builder in Options',
+  changelogV100DarkMode: 'Dark mode with auto system-detection',
+  changelogV100I18n: 'Multilingual UI (EN / FR / ES / DE / ZH / JA)',
+
+  // Feature categories (What's New — Features view)
+  featureCategoryTranslation: 'Translation',
+  featureCategoryPresets: 'Presets & Shortcuts',
+  featureCategoryTransformations: 'Transformations',
+  featureCategoryInterface: 'Interface & Experience',
+
+  // Feature items
+  featureDeepL: 'DeepL API (free & pro)',
+  featureGemini: 'Google Gemini API',
+  featureOpenAI: 'OpenAI-compatible APIs (OpenAI, Groq, OpenRouter, Ollama…)',
+  featureBuiltinAI: 'Chrome Built-in AI (on supported Chrome builds)',
+  featureCustomProvider: 'Per-preset custom provider override',
+  featureAutoDetect: 'Auto language detection',
+  featureMultiPreset: 'Multiple presets with names & dedicated shortcuts',
+  featurePinContextMenu: 'Pin a preset to the right-click context menu',
+  featureKeyboardShortcutPerPreset: 'Keyboard shortcut per preset (modifier + key sequence)',
+  featureWordSelectionModifier: 'Word-selection modifier (Modifier + Arrow keys)',
+  featureDraftAutoSave: 'Draft auto-save so you never lose changes',
+  featureLlmPromptMode: 'LLM Prompt mode with {{input}} placeholder',
+  featureUnicodeEffects: 'Unicode text effects (bold, italic, fraktur, cursive…)',
+  featureCustomMappings: 'Custom character-mapping transformations via Options',
+  featureDarkMode: 'Dark / Light / Auto theme',
+  featureI18n: '6-language UI (EN / FR / ES / DE / ZH / JA)',
+  featureInlinePreview: 'Inline preview during preset editing',
+  featurePendingIndicator: 'Pending-state indicator while the LLM is responding',
+
+  // Theme mode labels
+  themeAuto: 'Auto (system)',
+  themeLight: 'Light mode',
+  themeDark: 'Dark mode',
 } as const
 
 export type TranslationKey = keyof typeof enTranslations
@@ -355,7 +456,7 @@ const frTranslations: TranslationMap = {
   proUpgradeButton: 'Passer à la version Pro',
   proUpgradeComingSoon: '(bientôt disponible)',
   proClose: 'Fermer',
-  presetLockedTooltip: 'Verrouillé — passez à la version Pro pour modifier ce preset',
+  presetLockedTooltip: 'Verrouillé. Passez à la version Pro pour modifier ce preset',
   presetLockedMessage: 'Ce preset est verrouillé. Passez à la version Pro pour y accéder.',
   expandPrompt: "Expandre l'éditeur de texte",
 }
@@ -505,7 +606,7 @@ const esTranslations: TranslationMap = {
   proUpgradeButton: 'Actualizar a Pro',
   proUpgradeComingSoon: '(próximamente)',
   proClose: 'Cerrar',
-  presetLockedTooltip: 'Bloqueado — actualice a Pro para editar este preset',
+  presetLockedTooltip: 'Bloqueado. Actualice a Pro para editar este preset',
   presetLockedMessage: 'Este preset está bloqueado. Actualice a Pro para acceder a él.',
   expandPrompt: 'Ampliar editor de indicaciones',
 }
@@ -656,7 +757,7 @@ const deTranslations: TranslationMap = {
   proUpgradeButton: 'Upgrade auf Pro',
   proUpgradeComingSoon: '(demnächst verfügbar)',
   proClose: 'Schließen',
-  presetLockedTooltip: 'Gesperrt — Upgrade auf Pro, um dieses Preset zu bearbeiten',
+  presetLockedTooltip: 'Gesperrt. Upgrade auf Pro, um dieses Preset zu bearbeiten',
   presetLockedMessage: 'Dieses Preset ist gesperrt. Upgrade auf Pro, um darauf zuzugreifen.',
   expandPrompt: 'Prompt-Editor erweitern',
 }
@@ -800,7 +901,7 @@ const zhTranslations: TranslationMap = {
   proUpgradeButton: '升级到 Pro',
   proUpgradeComingSoon: '(即将推出)',
   proClose: '关闭',
-  presetLockedTooltip: '已锁定 — 升级到 Pro 以编辑此预设',
+  presetLockedTooltip: '已锁定 升级到 Pro 以编辑此预设',
   presetLockedMessage: '此预设已锁定。升级到 Pro 以访问它。',
   expandPrompt: '展开提示编辑器',
 }
@@ -949,7 +1050,7 @@ const jaTranslations: TranslationMap = {
   proUpgradeButton: 'Proにアップグレード',
   proUpgradeComingSoon: '(近日公開)',
   proClose: '閉じる',
-  presetLockedTooltip: 'ロック済み — このプリセットを編集するにはProにアップグレードしてください',
+  presetLockedTooltip: 'ロック済み このプリセットを編集するにはProにアップグレードしてください',
   presetLockedMessage:
     'このプリセットはロックされています。アクセスするにはProにアップグレードしてください。',
   expandPrompt: 'プロンプトエディターを展開',

@@ -31,8 +31,8 @@ try {
     env: {
       ...process.env,
       TARGET_BROWSER,
-      OUT_DIR
-    }
+      OUT_DIR,
+    },
   })
 
   console.log('\n✅ Firefox build completed!')
@@ -57,8 +57,8 @@ try {
 
   // Delete old Firefox zips (production or dev)
   const zipPattern = isDevMode
-    ? /^extension-boilerplate-firefox-dev-v.*\.zip$/
-    : /^extension-boilerplate-firefox-v.*\.zip$/
+    ? /^powerInput-firefox-dev-v.*\.zip$/
+    : /^powerInput-firefox-v.*\.zip$/
 
   fs.readdirSync(outputDir)
     .filter((file) => zipPattern.test(file))
@@ -73,8 +73,8 @@ try {
 
   // Create new zip (both dev and production)
   const zipName = isDevMode
-    ? `extension-boilerplate-firefox-dev-v${version}.zip`
-    : `extension-boilerplate-firefox-v${version}.zip`
+    ? `powerInput-firefox-dev-v${version}.zip`
+    : `powerInput-firefox-v${version}.zip`
   const zipPath = path.join(outputDir, zipName)
 
   console.log(`\n📦 Creating ${zipName}...`)
@@ -89,11 +89,11 @@ try {
   if (!isDevMode) {
     console.log(`\n📦 Creating source code ZIP for AMO...`)
 
-    const sourceZipName = `subtitle-downloader-source-v${version}.zip`
+    const sourceZipName = `powerInput-source-v${version}.zip`
     const sourceZipPath = path.join(outputDir, sourceZipName)
 
     // Delete all old source ZIPs
-    const sourceZipPattern = /^subtitle-downloader-source-v.*\.zip$/
+    const sourceZipPattern = /^powerInput-source-v.*\.zip$/
     fs.readdirSync(outputDir)
       .filter((file) => sourceZipPattern.test(file))
       .forEach((file) => {
@@ -106,7 +106,8 @@ try {
       })
 
     // Create source ZIP (exclude node_modules, dist folders, ZIPs, .git, .claude, logs, public)
-    execSync(`zip -r "${sourceZipPath}" . \\
+    execSync(
+      `zip -r "${sourceZipPath}" . \\
       -x "node_modules/*" \\
       -x "dist-chrome/*" \\
       -x "dist-firefox/*" \\
@@ -118,7 +119,7 @@ try {
       -x "public/*"`,
       {
         cwd: path.join(__dirname, '..'),
-        stdio: 'inherit'
+        stdio: 'inherit',
       }
     )
 
@@ -132,12 +133,13 @@ try {
   } else {
     console.log(`\n🚀 Ready to upload to Firefox Add-ons (AMO)!`)
     console.log(`📦 Upload extension: ${zipName}`)
-    console.log(`📦 Upload source code: subtitle-downloader-source-v${version}.zip`)
+    console.log(`📦 Upload source code: powerInput-source-v${version}.zip`)
     console.log(`\n⚠️ Note: You may need to update the extension ID in manifest.firefox.json`)
-    console.log(`   Current ID: subtitle-downloader@subtiltee.com`)
-    console.log(`   See: https://extensionworkshop.com/documentation/develop/extensions-and-the-add-on-id/`)
+    console.log(`   Current ID: powerInput@subtiltee.com`)
+    console.log(
+      `   See: https://extensionworkshop.com/documentation/develop/extensions-and-the-add-on-id/`
+    )
   }
-
 } catch (e) {
   console.error('❌ Error building Firefox extension:', e)
   process.exit(1)

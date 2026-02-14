@@ -91,13 +91,10 @@ export const featureSummary: FeatureSummary[] = [
 ]
 
 /**
- * Returns the current extension version from the manifest.
- * Falls back to a hard-coded string if the manifest is unavailable.
+ * Returns the current extension version.
+ * This value is automatically updated by scripts/update-version.js
+ * which reads from manifests/manifest.chrome.json (source of truth).
  */
 export function getCurrentVersion(): string {
-  try {
-    return chrome.runtime.getManifest().version
-  } catch {
-    return '1.0.0'
-  }
+  return '1.0.0' // This should match manifest.json version
 }

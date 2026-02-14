@@ -12,16 +12,11 @@
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "simple-input-translator@example.com",
+      "id": "powerInput@subtiltee.com",
       "strict_min_version": "140.0"
     }
   },
-  "permissions": [
-    "storage",
-    "clipboardWrite",
-    "contextMenus",
-    "tabs"
-  ],
+  "permissions": ["storage", "clipboardWrite", "contextMenus", "tabs"],
   "host_permissions": [
     "https://api-free.deepl.com/*",
     "https://api.deepl.com/*",

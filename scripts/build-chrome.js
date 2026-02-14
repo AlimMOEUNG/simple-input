@@ -58,7 +58,7 @@ try {
   // Only create ZIP in production mode
   if (!isDevMode) {
     // Delete old Chrome zips
-    const zipPattern = /^extension-boilerplate-chrome-v.*\.zip$/
+    const zipPattern = /^powerInput-chrome-v.*\.zip$/
     fs.readdirSync(outputDir)
       .filter((file) => zipPattern.test(file))
       .forEach((file) => {
@@ -71,7 +71,7 @@ try {
       })
 
     // Create new zip
-    const zipName = `extension-boilerplate-chrome-v${version}.zip`
+    const zipName = `powerInput-chrome-v${version}.zip`
     const zipPath = path.join(outputDir, zipName)
 
     console.log(`\n📦 Creating ${zipName}...`)

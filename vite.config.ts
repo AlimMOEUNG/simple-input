@@ -60,7 +60,7 @@ function bundleContentScript(mode: string, outDir: string) {
         outfile: resolve(distDir, 'content-script.js'),
         format: 'iife',
         platform: 'browser',
-        target: 'es2017',
+        target: 'es2020',
         define: {
           'process.env.NODE_ENV': isProduction ? '"production"' : '"development"',
           __VUE_OPTIONS_API__: 'true',
@@ -68,6 +68,14 @@ function bundleContentScript(mode: string, outDir: string) {
           __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false',
         },
         drop: isProduction ? ['console', 'debugger'] : undefined,
+        // Aggressive minification for production content script
+        minify: isProduction,
+        minifyWhitespace: isProduction,
+        minifyIdentifiers: isProduction,
+        minifySyntax: isProduction,
+        treeShaking: isProduction,
+        sourcemap: !isProduction ? 'inline' : false,
+        keepNames: !isProduction,
         logLevel: 'silent'
       })
     }
@@ -97,7 +105,7 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir,
       emptyOutDir: true,
-      sourcemap: mode === 'development', // Source maps only in development
+      sourcemap: mode === 'development' ? 'inline' : false, // Inline source maps in dev, none in prod
       minify: mode === 'production' ? 'terser' : false, // Use Terser for production minification
       terserOptions:
         mode === 'production'
@@ -105,10 +113,22 @@ export default defineConfig(({ mode }) => {
               compress: {
                 pure_funcs: ['console.log', 'console.debug', 'console.warn'], // Keep console.error
                 drop_debugger: true,
+                passes: 2,         // Two compression passes for better results
+                dead_code: true,   // Remove unreachable code
+                conditionals: true, // Optimize conditionals
+                evaluate: true,    // Evaluate constant expressions
+                booleans: true,    // Optimize boolean expressions
+                loops: true,       // Optimize loops
+                unused: true,      // Remove unused variables/functions
+                if_return: true,   // Optimize if/return sequences
+                join_vars: true,   // Join consecutive var declarations
               },
-              mangle: true, // Shorten variable names
+              mangle: {
+                safari10: true, // Workaround for Safari 10 bugs
+              },
               format: {
                 comments: false, // Remove comments
+                ecma: 2020,      // Target ES2020 output
               },
             }
           : undefined,
@@ -127,7 +147,13 @@ export default defineConfig(({ mode }) => {
           const name = chunkInfo.name.replace(/^_/, '')
           return `${name}.js`
         },
-        assetFileNames: '[name].[ext]'
+        assetFileNames: '[name].[ext]',
+        // Group Vue runtime into a dedicated chunk
+        manualChunks(id) {
+          if (id.includes('node_modules') && (id.includes('/vue/') || id.includes('/@vue/'))) {
+            return 'vue-runtime'
+          }
+        },
       }
     }
   },

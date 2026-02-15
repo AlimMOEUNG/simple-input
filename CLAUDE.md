@@ -254,4 +254,4 @@ Before publishing:
 
 ## License
 
-MIT
+Polyform Noncommercial 1.0.0 — personal use only, no commercial use.

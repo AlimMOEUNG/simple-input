@@ -259,4 +259,12 @@ npm run test:coverage  # With coverage report
 
 ## License
 
-MIT — see [LICENSE](LICENSE)
+**Polyform Noncommercial 1.0.0** — Source available, not open source.
+
+- Personal and educational use: allowed
+- Commercial use (selling, SaaS, paid products): **prohibited**
+- Redistribution with attribution: allowed
+
+See [LICENSE](LICENSE) for full terms.
+
+To request a commercial license, visit [github.com/AlimMOEUNG](https://github.com/AlimMOEUNG).

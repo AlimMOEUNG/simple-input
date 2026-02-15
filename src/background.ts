@@ -102,7 +102,7 @@ setupContextMenu()
 
 // Set the uninstall survey URL (English-only Tally form)
 function setUninstallUrl() {
-  chrome.runtime.setUninstallURL('https://tally.so/r/power-input-uninstall')
+  chrome.runtime.setUninstallURL('https://tally.so/r/Pd5oJ5')
 }
 
 // Initialize default settings on install

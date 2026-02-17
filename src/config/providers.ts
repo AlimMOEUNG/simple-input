@@ -27,6 +27,8 @@ export interface ProviderOption {
   label: string
   isLLM: boolean // Whether this provider requires a model (LLM-based)
   requiresApiKey: boolean
+  /** Whether the user must be able to edit the base URL in settings (Ollama, Custom) */
+  hasEditableBaseUrl: boolean
   description?: string
 }
 
@@ -40,6 +42,7 @@ export const AVAILABLE_PROVIDERS: ProviderOption[] = [
     label: 'Google Translate (Free)',
     isLLM: false,
     requiresApiKey: false,
+    hasEditableBaseUrl: false,
     description: 'Free translation service via Google Translate',
   },
   {
@@ -47,6 +50,7 @@ export const AVAILABLE_PROVIDERS: ProviderOption[] = [
     label: 'Chrome Built-in AI (Free)',
     isLLM: false,
     requiresApiKey: false,
+    hasEditableBaseUrl: false,
     description: 'Chrome built-in translation AI (experimental)',
   },
   {
@@ -54,6 +58,7 @@ export const AVAILABLE_PROVIDERS: ProviderOption[] = [
     label: 'DeepL API',
     isLLM: false,
     requiresApiKey: true,
+    hasEditableBaseUrl: false,
     description: 'High-quality translation via DeepL API',
   },
   {
@@ -61,6 +66,7 @@ export const AVAILABLE_PROVIDERS: ProviderOption[] = [
     label: 'Google Gemini API',
     isLLM: true,
     requiresApiKey: true,
+    hasEditableBaseUrl: false,
     description: 'Google Gemini LLM for translation',
   },
   {
@@ -68,6 +74,7 @@ export const AVAILABLE_PROVIDERS: ProviderOption[] = [
     label: 'ChatGPT (OpenAI)',
     isLLM: true,
     requiresApiKey: true,
+    hasEditableBaseUrl: false,
     description: 'OpenAI GPT models for translation',
   },
   {
@@ -75,6 +82,7 @@ export const AVAILABLE_PROVIDERS: ProviderOption[] = [
     label: 'Groq (Free & Fast)',
     isLLM: true,
     requiresApiKey: true,
+    hasEditableBaseUrl: false,
     description: 'Fast LLM inference via Groq',
   },
   {
@@ -82,6 +90,7 @@ export const AVAILABLE_PROVIDERS: ProviderOption[] = [
     label: 'Ollama (Local)',
     isLLM: true,
     requiresApiKey: false,
+    hasEditableBaseUrl: true, // User must configure the local instance URL
     description: 'Run local LLM models with Ollama',
   },
   {
@@ -89,6 +98,7 @@ export const AVAILABLE_PROVIDERS: ProviderOption[] = [
     label: 'OpenRouter',
     isLLM: true,
     requiresApiKey: true,
+    hasEditableBaseUrl: false,
     description: 'Access multiple LLMs via OpenRouter',
   },
   {
@@ -96,6 +106,7 @@ export const AVAILABLE_PROVIDERS: ProviderOption[] = [
     label: 'Custom OpenAI-compatible',
     isLLM: true,
     requiresApiKey: false, // Optional for custom endpoints
+    hasEditableBaseUrl: true, // User must provide their own endpoint URL
     description: 'Custom OpenAI-compatible API endpoint',
   },
 ]
@@ -144,4 +155,64 @@ export function providerRequiresApiKey(providerValue: string | undefined): boole
   if (!providerValue) return false
   const provider = getProviderByValue(providerValue)
   return provider?.requiresApiKey ?? false
+}
+
+import { PREDEFINED_MODELS, getDefaultModel, type ModelOption } from './predefinedModels'
+
+export interface ProviderConfig {
+  requiresApiKey: boolean
+  requiresBaseUrl: boolean
+  defaultBaseUrl: string
+  defaultModel: string
+  /** Non-empty only for LLM providers that have a known model list */
+  availableModels: ModelOption[]
+}
+
+/**
+ * Returns runtime configuration metadata for a given provider value.
+ * Used by TranslationPanel and LLMPromptPanel to determine which fields to show
+ * (base URL input, API key input, model selector) and what defaults to use.
+ */
+export function getProviderConfig(provider: string): ProviderConfig {
+  const providerOption = AVAILABLE_PROVIDERS.find((p) => p.value === provider)
+  const isLLM = providerOption?.isLLM ?? false
+  const requiresApiKey = providerOption?.requiresApiKey ?? false
+
+  const config: ProviderConfig = {
+    requiresApiKey,
+    requiresBaseUrl: false,
+    defaultBaseUrl: '',
+    defaultModel: '',
+    availableModels: [],
+  }
+
+  if (isLLM && provider !== 'custom') {
+    const key = provider as keyof typeof PREDEFINED_MODELS
+    config.availableModels = PREDEFINED_MODELS[key] || []
+    config.defaultModel = getDefaultModel(key)
+  }
+
+  switch (provider) {
+    case 'chatgpt':
+      config.requiresBaseUrl = true
+      config.defaultBaseUrl = PROVIDER_BASE_URLS.chatgpt
+      break
+    case 'groq':
+      config.requiresBaseUrl = true
+      config.defaultBaseUrl = PROVIDER_BASE_URLS.groq
+      break
+    case 'ollama':
+      config.requiresBaseUrl = true
+      config.defaultBaseUrl = PROVIDER_BASE_URLS.ollama
+      break
+    case 'openrouter':
+      config.requiresBaseUrl = true
+      config.defaultBaseUrl = PROVIDER_BASE_URLS.openrouter
+      break
+    case 'custom':
+      config.requiresBaseUrl = true
+      break
+  }
+
+  return config
 }

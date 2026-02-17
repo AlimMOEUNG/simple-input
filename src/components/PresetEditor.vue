@@ -1,13 +1,12 @@
 <template>
   <div class="preset-editor space-y-2 relative">
-    <!-- Preset Name (no label, just input with save/undo buttons) -->
+    <!-- Preset name input + inline save / undo buttons -->
     <div class="flex gap-1 items-center">
       <input
         v-model="localPreset.name"
         :placeholder="t('presetNamePlaceholder')"
         class="flex-1 px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
       />
-      <!-- Save/Undo buttons (only visible when unsaved changes exist) -->
       <template v-if="hasUnsavedChanges">
         <button
           @click="undoChanges"
@@ -29,7 +28,7 @@
       </template>
     </div>
 
-    <!-- Mode (always visible, not in accordion) -->
+    <!-- Mode selector (always visible) -->
     <div class="flex items-center gap-2 pt-1">
       <label class="text-[10px] font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">
         {{ t('presetModeLabel') }}
@@ -39,9 +38,7 @@
         @change="
           (e) => {
             const value = (e.target as HTMLSelectElement).value
-            if (isValidPresetType(value)) {
-              handleModeChange(value)
-            }
+            if (isValidPresetType(value)) handleModeChange(value)
           }
         "
         class="flex-1 px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -52,347 +49,62 @@
       </select>
     </div>
 
-    <!-- Settings (all modes visible, no accordion) -->
+    <!-- Mode-specific panel (delegated to extracted components) -->
     <div class="space-y-1.5">
-      <!-- Translation Panel -->
-      <template v-if="localPreset.type === 'translation'">
-        <div class="flex items-center gap-2">
-          <label class="text-[10px] font-semibold text-gray-700 dark:text-gray-300 w-24 shrink-0">
-            {{ t('sourceLanguage') }}
-          </label>
-          <div class="flex-1">
-            <LanguageSelector
-              v-model="localPreset.sourceLang"
-              :placeholder="t('searchLanguagePlaceholder')"
-              input-id="source-language-selector"
-              include-auto-detect
-            />
-          </div>
-        </div>
-        <div class="flex items-center gap-2">
-          <label class="text-[10px] font-semibold text-gray-700 dark:text-gray-300 w-24 shrink-0">
-            {{ t('targetLanguage') }}
-          </label>
-          <div class="flex-1">
-            <LanguageSelector
-              v-model="localPreset.targetLang"
-              :placeholder="t('searchLanguagePlaceholder')"
-              input-id="target-language-selector"
-            />
-          </div>
-        </div>
+      <!-- Translation panel -->
+      <TranslationPanel
+        v-if="localPreset.type === 'translation'"
+        :sourceLang="localPreset.sourceLang"
+        @update:sourceLang="localPreset.sourceLang = $event"
+        :targetLang="localPreset.targetLang"
+        @update:targetLang="localPreset.targetLang = $event"
+        :useCustomProvider="localPreset.useCustomProvider ?? false"
+        @update:useCustomProvider="localPreset.useCustomProvider = $event"
+        :customProvider="localPreset.customProvider ?? ''"
+        @update:customProvider="localPreset.customProvider = $event as TranslationProvider"
+        :presetConfig="presetConfig"
+        @update:presetConfig="presetConfig = $event"
+        @provider-change="onTranslationProviderChange"
+      />
 
-        <!-- Custom Provider (inline, only for translation mode) -->
-        <div class="flex items-start gap-2 pt-1">
-          <div class="flex items-center gap-2 w-24 shrink-0 pt-1.5">
-            <input
-              type="checkbox"
-              id="useCustomProvider"
-              v-model="localPreset.useCustomProvider"
-              class="w-3.5 h-3.5 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-1 focus:ring-blue-500"
-            />
-            <label
-              for="useCustomProvider"
-              class="text-[10px] font-semibold text-gray-700 dark:text-gray-300 cursor-pointer"
-            >
-              Custom
-            </label>
-          </div>
-          <div class="flex-1 space-y-1.5" v-if="localPreset.useCustomProvider">
-            <!-- Provider selection -->
-            <select
-              v-model="localPreset.customProvider"
-              @change="onCustomProviderChange"
-              class="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-            >
-              <option
-                v-for="provider in AVAILABLE_PROVIDERS"
-                :key="provider.value"
-                :value="provider.value"
-              >
-                {{ provider.label }}
-              </option>
-            </select>
+      <!-- Transformation panel -->
+      <TransformationPanel
+        v-else-if="localPreset.type === 'transformation'"
+        :transformationStyle="localPreset.transformationStyle"
+        @update:transformationStyle="localPreset.transformationStyle = $event as TransformationStyle"
+        :customExampleText="customExampleText"
+        @update:customExampleText="customExampleText = $event"
+      />
 
-            <!-- Generic Provider Configuration (DRY approach) -->
-            <template v-if="localPreset.customProvider && currentProviderConfig">
-              <!-- Base URL (if required) -->
-              <input
-                v-if="currentProviderConfig.requiresBaseUrl"
-                v-model="presetConfig.baseUrl"
-                type="text"
-                :placeholder="
-                  localPreset.customProvider === 'custom'
-                    ? 'Base URL (e.g., http://localhost:1234/v1)'
-                    : `Base URL (e.g., ${currentProviderConfig.defaultBaseUrl})`
-                "
-                class="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
+      <!-- Custom transform panel -->
+      <CustomTransformPanel
+        v-else-if="localPreset.type === 'custom-transform'"
+        :customTransformId="localPreset.customTransformId"
+        @update:customTransformId="localPreset.customTransformId = $event"
+        :customExampleText="customExampleText"
+        @update:customExampleText="customExampleText = $event"
+      />
 
-              <!-- API Key (if required) -->
-              <input
-                v-if="currentProviderConfig.requiresApiKey"
-                v-model="presetConfig.apiKey"
-                type="password"
-                :placeholder="
-                  localPreset.customProvider === 'custom'
-                    ? 'API Key (optional)'
-                    : t('apiKeyPlaceholder')
-                "
-                class="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
-              <!-- CTA subscription — only shown when the API key field is visible -->
-              <a
-                v-if="currentProviderConfig.requiresApiKey"
-                href="https://tally.so/r/9qDkWK"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="block text-[10px] text-blue-500 dark:text-blue-400 hover:underline cursor-pointer"
-              >
-                {{ t('apiKeySubscriptionCta') }}
-              </a>
-
-              <!-- Model Dropdown (for LLM providers with predefined models) -->
-              <select
-                v-if="currentProviderConfig.availableModels.length > 0"
-                v-model="presetConfig.model"
-                class="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-              >
-                <option
-                  v-for="model in currentProviderConfig.availableModels"
-                  :key="model.value"
-                  :value="model.value"
-                >
-                  {{ model.isCustom ? t('customModel') : model.label }}
-                </option>
-              </select>
-
-              <!-- Custom Model Input (when 'custom' is selected from dropdown) -->
-              <input
-                v-if="
-                  currentProviderConfig.availableModels.length > 0 &&
-                  isCustomModel(presetConfig.model || '')
-                "
-                v-model="presetConfig.customModel"
-                :placeholder="t('placeholderCustomModel')"
-                class="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
-
-              <!-- Model Input (for custom provider without dropdown) -->
-              <input
-                v-if="
-                  localPreset.customProvider === 'custom' &&
-                  currentProviderConfig.availableModels.length === 0
-                "
-                v-model="presetConfig.model"
-                type="text"
-                :placeholder="t('placeholderCustomModel')"
-                class="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
-            </template>
-          </div>
-        </div>
-      </template>
-
-      <!-- Transformation Panel -->
-      <template v-else-if="localPreset.type === 'transformation'">
-        <div class="flex items-center gap-2">
-          <label class="text-[10px] font-semibold text-gray-700 dark:text-gray-300 w-24 shrink-0">
-            {{ t('transformationStyle') }}
-          </label>
-          <select
-            v-model="localPreset.transformationStyle"
-            class="flex-1 px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 font-unicode"
-          >
-            <option
-              v-for="style in transformationStyles"
-              :key="style.value"
-              :value="style.value"
-              class="font-unicode"
-            >
-              {{ style.label }} - {{ style.example }}
-            </option>
-          </select>
-        </div>
-        <!-- Live Preview -->
-        <div v-if="localPreset.transformationStyle" class="space-y-1">
-          <div class="flex items-center gap-2">
-            <label class="text-[10px] font-semibold text-gray-700 dark:text-gray-300 w-24 shrink-0">
-              {{ t('previewExample') }}
-            </label>
-            <input
-              v-model="customExampleText"
-              :placeholder="t('previewPlaceholder')"
-              class="flex-1 px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-            />
-          </div>
-          <div
-            class="ml-[7rem] p-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-sm text-gray-900 dark:text-gray-100 preview-transformed"
-          >
-            {{ transformedPreview }}
-          </div>
-        </div>
-      </template>
-
-      <!-- Custom Transform Panel -->
-      <template v-else-if="localPreset.type === 'custom-transform'">
-        <div class="flex items-center gap-2">
-          <label class="text-[10px] font-semibold text-gray-700 dark:text-gray-300 w-24 shrink-0">
-            {{ t('customTransformLabel') }}
-          </label>
-          <select
-            v-model="localPreset.customTransformId"
-            class="flex-1 px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-          >
-            <option value="" disabled>{{ t('customTransformPlaceholder') }}</option>
-            <option v-for="ct in customTransforms" :key="ct.id" :value="ct.id">
-              {{ ct.name }} ({{ Object.keys(ct.charMap).length }} mappings)
-            </option>
-          </select>
-        </div>
-        <p
-          v-if="customTransforms.length === 0"
-          class="text-[10px] text-gray-500 dark:text-gray-400 ml-[7rem]"
-        >
-          {{ t('customTransformEmpty') }}
-        </p>
-        <button
-          @click="openOptionsPage"
-          class="ml-[7rem] px-2 py-1.5 text-xs rounded bg-gray-100 dark:bg-gray-800 text-blue-600 dark:text-blue-400 border border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-        >
-          {{ t('customTransformOpenOptions') }}
-        </button>
-        <!-- Live Preview -->
-        <div v-if="localPreset.customTransformId && selectedCustomTransform" class="space-y-1">
-          <div class="flex items-center gap-2">
-            <label class="text-[10px] font-semibold text-gray-700 dark:text-gray-300 w-24 shrink-0">
-              {{ t('previewExample') }}
-            </label>
-            <input
-              v-model="customExampleText"
-              :placeholder="t('previewPlaceholder')"
-              class="flex-1 px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-            />
-          </div>
-          <div
-            class="ml-[7rem] p-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-sm text-gray-900 dark:text-gray-100 preview-transformed"
-          >
-            {{ customTransformPreview }}
-          </div>
-        </div>
-      </template>
-
-      <!-- LLM Prompt Panel -->
-      <template v-else-if="localPreset.type === 'llm-prompt'">
-        <div class="flex flex-col gap-1">
-          <!-- Label inline with info icon and expand button -->
-          <div class="flex items-center gap-1">
-            <span class="text-[10px] font-semibold text-gray-700 dark:text-gray-300">
-              {{ t('llmPromptLabel') }}
-            </span>
-            <span :title="t('llmPromptHint')" class="cursor-help leading-none">
-              <Info :size="12" class="text-gray-400 dark:text-gray-500" />
-            </span>
-            <button
-              type="button"
-              :title="t('expandPrompt')"
-              @click="showPromptModal = true"
-              class="flex items-center px-1 py-0.5 rounded border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 hover:border-blue-400 dark:hover:border-blue-500 bg-white dark:bg-gray-800 transition-colors"
-            >
-              <Maximize2 :size="10" />
-            </button>
-          </div>
-          <!-- Full-width textarea -->
-          <textarea
-            v-model="localPreset.prompt"
-            :placeholder="t('llmPromptHint')"
-            rows="3"
-            class="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
-          />
-        </div>
-        <div class="flex items-center gap-2">
-          <label class="text-[10px] font-semibold text-gray-700 dark:text-gray-300 w-24 shrink-0">
-            {{ t('llmPromptProviderLabel') }}
-          </label>
-          <select
-            v-model="localPreset.llmProvider"
-            @change="onLLMProviderChange"
-            class="flex-1 px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-          >
-            <option v-for="p in LLM_PROVIDERS" :key="p.value" :value="p.value">
-              {{ p.label }}
-            </option>
-          </select>
-        </div>
-
-        <!-- Base URL (only for 'custom' provider — other LLM providers have a fixed known URL) -->
-        <div v-if="localPreset.type === 'llm-prompt' && (localPreset as LLMPromptPreset).llmProvider === 'custom'" class="flex items-center gap-2">
-          <label class="text-[10px] font-semibold text-gray-700 dark:text-gray-300 w-24 shrink-0">
-            Base URL
-          </label>
-          <input
-            v-model="llmBaseUrlDraft"
-            type="text"
-            placeholder="Base URL (e.g., http://localhost:1234/v1)"
-            class="flex-1 px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-          />
-        </div>
-
-        <!-- API Key (if the selected LLM provider requires it — reads/writes global providerConfigs) -->
-        <div v-if="llmCurrentProviderConfig?.requiresApiKey" class="flex flex-col gap-0.5">
-          <div class="flex items-center gap-2">
-            <label class="text-[10px] font-semibold text-gray-700 dark:text-gray-300 w-24 shrink-0">
-              API Key
-            </label>
-            <input
-              v-model="llmApiKeyDraft"
-              type="password"
-              :placeholder="t('apiKeyPlaceholder')"
-              class="flex-1 px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-            />
-          </div>
-          <!-- CTA subscription link shown below the API key field -->
-          <a
-            href="https://tally.so/r/9qDkWK"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="block text-[10px] text-blue-500 dark:text-blue-400 hover:underline cursor-pointer ml-[6.5rem]"
-          >
-            {{ t('apiKeySubscriptionCta') }}
-          </a>
-        </div>
-
-        <div class="flex items-start gap-2">
-          <label
-            class="text-[10px] font-semibold text-gray-700 dark:text-gray-300 w-24 shrink-0 pt-1.5"
-          >
-            {{ t('llmPromptModelLabel') }}
-          </label>
-          <div class="flex-1 space-y-1">
-            <!-- Dropdown of predefined models (for providers that have them) -->
-            <select
-              v-if="llmHasPredefinedModels"
-              v-model="llmModelSelection"
-              class="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-            >
-              <option v-for="model in llmAvailableModels" :key="model.value" :value="model.value">
-                {{ model.isCustom ? t('customModel') : model.label }}
-              </option>
-            </select>
-            <!-- Free-text input: shown when 'custom' is selected or provider has no predefined list -->
-            <input
-              v-if="!llmHasPredefinedModels || isCustomModel(llmModelSelection)"
-              v-model="llmCustomModelInput"
-              type="text"
-              :placeholder="t('placeholderCustomModel')"
-              class="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-            />
-          </div>
-        </div>
-      </template>
+      <!-- LLM prompt panel -->
+      <LLMPromptPanel
+        v-else-if="localPreset.type === 'llm-prompt'"
+        :prompt="localPreset.prompt"
+        @update:prompt="localPreset.prompt = $event"
+        :llmProvider="localPreset.llmProvider"
+        @update:llmProvider="localPreset.llmProvider = $event"
+        :llmModelSelection="llmModelSelection"
+        @update:llmModelSelection="llmModelSelection = $event"
+        :llmCustomModelInput="llmCustomModelInput"
+        @update:llmCustomModelInput="llmCustomModelInput = $event"
+        :llmApiKeyDraft="llmApiKeyDraft"
+        @update:llmApiKeyDraft="llmApiKeyDraft = $event"
+        :llmBaseUrlDraft="llmBaseUrlDraft"
+        @update:llmBaseUrlDraft="llmBaseUrlDraft = $event"
+        @provider-change="onLLMProviderChange"
+      />
     </div>
 
-    <!-- Keyboard Shortcut (always visible, not in accordion) -->
+    <!-- Keyboard shortcut -->
     <div class="pt-1">
       <div class="flex items-center gap-2">
         <label class="text-[10px] font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">
@@ -417,7 +129,8 @@
       <p v-if="shortcutError" class="text-[10px] text-red-600 mt-0.5">
         {{ shortcutError }}
       </p>
-      <!-- Pinned preset checkbox — disabled when already pinned (cannot unpin without selecting another) -->
+
+      <!-- Pinned preset checkbox (disabled when already pinned) -->
       <div class="flex items-center gap-2 mt-1">
         <input
           type="checkbox"
@@ -437,7 +150,7 @@
       </div>
     </div>
 
-    <!-- Unsaved changes warning banner -->
+    <!-- Unsaved changes banner -->
     <div
       v-if="hasUnsavedChanges"
       class="flex items-center justify-between gap-2 p-2 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded"
@@ -463,7 +176,7 @@
       </div>
     </div>
 
-    <!-- Delete Button -->
+    <!-- Delete button -->
     <button
       v-if="canDelete"
       @click="showDeleteDialog = true"
@@ -472,7 +185,7 @@
       {{ t('deletePreset') }}
     </button>
 
-    <!-- Delete Confirmation Dialog -->
+    <!-- Delete confirmation dialog -->
     <ConfirmDialog
       :show="showDeleteDialog"
       :title="t('presetDeleteTitle')"
@@ -484,7 +197,7 @@
       @cancel="showDeleteDialog = false"
     />
 
-    <!-- Validation Error Dialog -->
+    <!-- Validation error dialog -->
     <ConfirmDialog
       :show="showValidationDialog"
       :title="validationDialogTitle"
@@ -496,66 +209,7 @@
       @cancel="showValidationDialog = false"
     />
 
-    <!-- Expanded prompt modal — full-size textarea overlay -->
-    <Teleport to="body">
-      <div
-        v-if="showPromptModal && localPreset.type === 'llm-prompt'"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
-        @click.self="showPromptModal = false"
-      >
-        <!-- Modal fills almost the full popup height with a small margin -->
-        <div
-          class="w-[360px] bg-white dark:bg-gray-900 rounded-lg shadow-xl flex flex-col overflow-hidden"
-          style="height: calc(100vh - 24px); max-height: calc(100vh - 24px)"
-        >
-          <!-- Modal header -->
-          <div
-            class="flex items-center justify-between px-3 py-2 border-b border-gray-200 dark:border-gray-700 shrink-0"
-          >
-            <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">
-              {{ t('llmPromptLabel') }}
-            </span>
-            <button
-              type="button"
-              @click="showPromptModal = false"
-              class="p-0.5 rounded text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-            >
-              <X :size="14" />
-            </button>
-          </div>
-          <!-- Modal body — textarea stretches to fill remaining height -->
-          <div class="p-3 flex flex-col gap-2 flex-1 overflow-hidden">
-            <!-- Template selector inside the expanded modal -->
-            <select
-              v-model="selectedTemplateId"
-              @change="onTemplateSelected"
-              class="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-500 dark:text-gray-400 shrink-0"
-            >
-              <option value="" disabled>{{ t('llmPromptTemplatesPlaceholder') }}</option>
-              <option
-                v-for="tpl in PROMPT_TEMPLATES"
-                :key="tpl.id"
-                :value="tpl.id"
-              >
-                {{ tpl.icon }} {{ tpl.name }}
-              </option>
-            </select>
-            <textarea
-              ref="modalPromptTextarea"
-              v-model="localPreset.prompt"
-              :placeholder="t('llmPromptPlaceholder')"
-              class="w-full flex-1 px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
-              autofocus
-            />
-            <p class="text-[10px] text-gray-500 dark:text-gray-400 shrink-0">
-              {{ t('llmPromptHint') }}
-            </p>
-          </div>
-        </div>
-      </div>
-    </Teleport>
-
-    <!-- Locked overlay — shown when the preset index exceeds the free limit and user has no Pro access -->
+    <!-- Locked overlay (Pro feature gate) -->
     <div
       v-if="isPresetLocked(presetIndex)"
       class="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-white/90 dark:bg-gray-900/90 rounded-lg backdrop-blur-sm"
@@ -569,8 +223,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed, onMounted, nextTick } from 'vue'
-import { Check, RotateCcw, Info, Lock, Maximize2, X } from 'lucide-vue-next'
+import { ref, watch, computed, onMounted } from 'vue'
+import { Check, RotateCcw, Info, Lock } from 'lucide-vue-next'
 import { useI18nWrapper } from '@/composables/useI18nWrapper'
 import { useDraftPreset, type DraftPresetState } from '@/composables/useDraftPreset'
 import { usePro } from '@/composables/usePro'
@@ -585,51 +239,32 @@ import type {
   TranslationProvider,
   LLMProvider,
   LLMPromptPreset,
-  CustomTransformation,
+  TransformationStyle,
+  PresetProviderConfig,
 } from '@/types/common'
-import {
-  TransformationEngine,
-  applyCustomCharMap,
-} from '@/core/transformation/TransformationEngine'
-import { getAllCustomTransforms } from '@/services/customTransformService'
-import { AVAILABLE_PROVIDERS, getLLMProviders, PROVIDER_BASE_URLS } from '@/config/providers'
-import { PROMPT_TEMPLATES } from '@/config/promptTemplates'
-import {
-  PREDEFINED_MODELS,
-  isCustomModel,
-  getEffectiveModel,
-  getDefaultModel,
-  type ModelOption,
-} from '@/config/predefinedModels'
+import { getEffectiveModel, isCustomModel, getDefaultModel, PREDEFINED_MODELS } from '@/config/predefinedModels'
+import { getProviderConfig } from '@/config/providers'
 import { validateProviderCredentials } from '@/utils/providerValidation'
 import ConfirmDialog from './ConfirmDialog.vue'
-import LanguageSelector from './LanguageSelector.vue'
+import TranslationPanel from './TranslationPanel.vue'
+import TransformationPanel from './TransformationPanel.vue'
+import CustomTransformPanel from './CustomTransformPanel.vue'
+import LLMPromptPanel from './LLMPromptPanel.vue'
 
 const { t } = useI18nWrapper()
 const { providerConfigs } = useSettings()
 const { loadDraft, saveDraft, clearDraft } = useDraftPreset()
 
-// Ref to the textarea inside the expanded modal — used for native Ctrl+Z support
-const modalPromptTextarea = ref<HTMLTextAreaElement | null>(null)
-
-// Tracks the currently selected template id in the modal selector.
-// Reset to '' after each selection so the dropdown always shows the placeholder.
-const selectedTemplateId = ref('')
-
 // Debounce timer for draft auto-save
 let draftSaveTimer: ReturnType<typeof setTimeout> | null = null
 
-// In-memory mirror of the persisted draft — kept in sync with storage so the
-// preset-switch watcher can restore state synchronously (no async read = no flash)
+// In-memory mirror of the persisted draft (no async flash on preset-switch)
 const memoryCachedDraft = ref<DraftPresetState | null>(null)
 
 // Sequence detector for multi-key shortcut capture
 const sequenceDetector = new KeyboardSequenceDetector()
 
-// Transformation engine instance for built-in style preview
-const transformationEngine = new TransformationEngine()
-
-// Mode definitions driving the 4-pill selector
+// Mode definitions driving the mode selector
 const PRESET_MODES = [
   { type: 'translation' as const, i18nKey: 'presetModeTranslator' as const },
   { type: 'transformation' as const, i18nKey: 'presetModeTransformer' as const },
@@ -637,10 +272,7 @@ const PRESET_MODES = [
   { type: 'llm-prompt' as const, i18nKey: 'presetModeLLMPrompt' as const },
 ] as const
 
-// LLM provider options for the per-preset provider dropdown
-const LLM_PROVIDERS = getLLMProviders()
-
-// Maps global TranslationProvider values to their corresponding LLMProvider value.
+// Maps global TranslationProvider to LLMProvider when both share the same key
 const PROVIDER_TO_LLM: Record<string, string> = {
   gemini: 'gemini',
   chatgpt: 'chatgpt',
@@ -656,12 +288,11 @@ interface Props {
   canDelete: boolean
   globalProvider?: TranslationProvider
   isPinned?: boolean
-  /** Index of this preset in the presets array — used to determine if it is locked */
+  /** Index of this preset in the array — used for the Pro feature lock check */
   presetIndex: number
 }
 
 const props = defineProps<Props>()
-
 const { isPresetLocked } = usePro()
 
 const emit = defineEmits<{
@@ -676,162 +307,106 @@ const localPreset = ref<Preset>({ ...props.preset })
 const shortcutError = ref('')
 const showDeleteDialog = ref(false)
 const showValidationDialog = ref(false)
-const showPromptModal = ref(false)
-// True while async credential validation + save is in progress
 const isSaving = ref(false)
 const validationDialogTitle = ref('')
 const validationDialogMessage = ref('')
 
-// Shared preview input text (transformation + custom-transform)
+// Shared preview example text used by TransformationPanel and CustomTransformPanel
 const customExampleText = ref('Type to preview...')
 
-// Custom transformations loaded from storage for the dropdown
-const customTransforms = ref<CustomTransformation[]>([])
+// Per-preset custom provider config (translation mode only)
+const presetConfig = ref<PresetProviderConfig>({})
 
-//  Custom provider configuration (reactive proxy for localPreset.customProviderConfig)
-const presetConfig = ref<import('@/types/common').PresetProviderConfig>({})
-
-// LLM model selection state (separate from localPreset.llmModel which stores the resolved value)
-// llmModelSelection holds the dropdown value (can be 'custom' for providers with predefined models)
-// llmCustomModelInput holds the free-text model name when 'custom' is selected
+// LLM model selection state — separate from localPreset.llmModel (which stores the resolved value)
 const llmModelSelection = ref('')
 const llmCustomModelInput = ref('')
+
+// Drafts for global provider credentials — written to providerConfigs only on save
+const llmApiKeyDraft = ref('')
+const llmBaseUrlDraft = ref('')
 
 // ─── LLM model helpers ────────────────────────────────────────────
 
 /**
- * Initialize llmModelSelection and llmCustomModelInput from a stored (resolved) model name.
- * Determines whether the stored model is predefined or custom for the given provider.
+ * Initialise llmModelSelection / llmCustomModelInput from a stored (resolved) model name.
  */
 function initLLMModelState(provider: LLMProvider, storedModel: string) {
-  const models = (PREDEFINED_MODELS as Record<string, ModelOption[]>)[provider] || []
-  // Providers with no real predefined models (e.g. 'custom', 'ollama') use a plain text input
+  const models =
+    (PREDEFINED_MODELS as Record<string, { value: string; isCustom?: boolean }[]>)[provider] || []
   const predefinedValues = models.filter((m) => !m.isCustom).map((m) => m.value)
 
   if (predefinedValues.length === 0) {
-    // No dropdown - text input directly stores the model name
     llmModelSelection.value = storedModel
     llmCustomModelInput.value = ''
   } else if (predefinedValues.includes(storedModel)) {
-    // Matches a known predefined entry
     llmModelSelection.value = storedModel
     llmCustomModelInput.value = ''
   } else {
-    // Unknown model → treat as custom
     llmModelSelection.value = 'custom'
     llmCustomModelInput.value = storedModel
   }
 }
 
 /**
- * Initialise the local API key / base URL drafts from global providerConfigs.
- * Called whenever the active llm-prompt preset or its provider changes.
+ * Initialise llmApiKeyDraft / llmBaseUrlDraft from the saved global providerConfigs.
  */
 function initLLMCredentialDrafts(provider: LLMProvider) {
-  const cfg = providerConfigs.value[provider as keyof ProviderConfigs] as {
-    apiKey?: string
-    baseUrl?: string
-  }
+  const cfg = providerConfigs.value[provider as keyof ProviderConfigs] as
+    | { apiKey?: string; baseUrl?: string }
+    | undefined
   llmApiKeyDraft.value = cfg?.apiKey ?? ''
   llmBaseUrlDraft.value = cfg?.baseUrl ?? ''
-  // No need to set originals — they are computed from providerConfigs directly
+}
+
+// ─── Panel event handlers ─────────────────────────────────────────
+
+/**
+ * Called when TranslationPanel fires provider-change.
+ * Resets presetConfig to the new provider's defaults (no credential carry-over).
+ */
+function onTranslationProviderChange(_newProvider: string, defaultConfig: PresetProviderConfig) {
+  presetConfig.value = defaultConfig
 }
 
 /**
- * Reset LLM model state to the provider default when the user selects a different provider.
- * Called via @change on the provider <select>.
+ * Called when LLMPromptPanel fires provider-change.
+ * Updates all LLM-related refs atomically so draft-save and dirty-check stay consistent.
  */
-function onLLMProviderChange() {
-  if (localPreset.value.type !== 'llm-prompt') return
-  const provider = (localPreset.value as LLMPromptPreset).llmProvider
-  const models = (PREDEFINED_MODELS as Record<string, ModelOption[]>)[provider] || []
-  const defaultModel = models.find((m) => !m.isCustom)?.value || ''
-  llmModelSelection.value = defaultModel
-  llmCustomModelInput.value = ''
-  // Reload credential drafts for the newly selected provider
-  initLLMCredentialDrafts(provider)
-}
-
-/**
- * Called when the user picks an item from the template dropdown.
- * Applies the template then resets the selector back to the placeholder
- * in the next tick so the dropdown always reads "— Browse templates —".
- */
-function onTemplateSelected() {
-  const id = selectedTemplateId.value
-  applyPromptTemplate(id)
-  // Reset to placeholder after Vue processes the current render cycle
-  nextTick(() => {
-    selectedTemplateId.value = ''
-  })
-}
-
-/**
- * Apply a pre-made prompt template to the modal textarea.
- * Uses execCommand('insertText') so the browser registers the change in its
- * native undo stack — Ctrl+Z will restore the previous prompt content.
- * Vue's v-model syncs automatically via the 'input' event fired by execCommand.
- */
-function applyPromptTemplate(templateId: string) {
-  if (!templateId || localPreset.value.type !== 'llm-prompt') return
-  const template = PROMPT_TEMPLATES.find((tpl) => tpl.id === templateId)
-  if (!template) return
-
-  const textarea = modalPromptTextarea.value
-  if (textarea) {
-    // Focus + select all so execCommand replaces the full content
-    textarea.focus()
-    textarea.select()
-    // execCommand is deprecated but universally supported and pushes to the undo stack
-    const success = document.execCommand('insertText', false, template.prompt)
-    if (!success) {
-      // Fallback for environments where execCommand is blocked (no undo support)
-      localPreset.value.prompt = template.prompt
-    }
-  } else {
-    // Modal textarea not mounted yet (should not happen) — direct assignment fallback
-    localPreset.value.prompt = template.prompt
-  }
+function onLLMProviderChange(
+  _provider: LLMProvider,
+  modelSelection: string,
+  customModelInput: string,
+  apiKeyDraft: string,
+  baseUrlDraft: string
+) {
+  llmModelSelection.value = modelSelection
+  llmCustomModelInput.value = customModelInput
+  llmApiKeyDraft.value = apiKeyDraft
+  llmBaseUrlDraft.value = baseUrlDraft
 }
 
 // ─── Draft persistence ────────────────────────────────────────────
 
-/**
- * Schedule a debounced draft save (400 ms).
- * Only writes if there are actually unsaved changes.
- */
 function scheduleDraftSave() {
   if (draftSaveTimer) clearTimeout(draftSaveTimer)
   draftSaveTimer = setTimeout(async () => {
     if (!hasUnsavedChanges.value) return
     const state: DraftPresetState = {
       presetId: props.preset.id,
-      // Strip Vue Proxy before storing
       localPreset: JSON.parse(JSON.stringify(localPreset.value)),
       presetConfig: { ...presetConfig.value },
       llmModelSelection: llmModelSelection.value,
       llmCustomModelInput: llmCustomModelInput.value,
-      // Persist credential drafts so they survive a popup close/reopen
       llmApiKeyDraft: llmApiKeyDraft.value,
       llmBaseUrlDraft: llmBaseUrlDraft.value,
       customExampleText: customExampleText.value,
       savedAt: Date.now(),
     }
-    // Update memory cache synchronously so the watcher can restore without a storage round-trip
     memoryCachedDraft.value = state
     await saveDraft(state)
   }, 400)
 }
 
-/**
- * Load a persisted draft and restore editor state if the draft belongs to the
- * currently displayed preset and passes basic structural validation.
- * Called at the end of onMounted (after baseline init).
- */
-/**
- * Apply a validated draft object to the editor state (synchronous).
- * Shared by both the async load path (onMounted) and the sync cache path (watcher).
- */
 function applyDraft(draft: DraftPresetState) {
   localPreset.value = draft.localPreset
   if (draft.localPreset.type === 'translation') {
@@ -840,8 +415,6 @@ function applyDraft(draft: DraftPresetState) {
   if (draft.localPreset.type === 'llm-prompt') {
     llmModelSelection.value = draft.llmModelSelection || ''
     llmCustomModelInput.value = draft.llmCustomModelInput || ''
-    // Restore credential drafts — originals stay pointing to current providerConfigs
-    // so the dirty check correctly marks the preset as having unsaved changes
     if (draft.llmApiKeyDraft !== undefined) llmApiKeyDraft.value = draft.llmApiKeyDraft
     if (draft.llmBaseUrlDraft !== undefined) llmBaseUrlDraft.value = draft.llmBaseUrlDraft
   }
@@ -853,38 +426,25 @@ function applyDraft(draft: DraftPresetState) {
   }
 }
 
-/**
- * Load draft from storage, populate the memory cache, and apply to editor state.
- * Only called from onMounted — async is fine here since the component is just mounting.
- */
 async function restoreDraftIfValid() {
   try {
     const draft = await loadDraft()
     if (!draft) return
-    // Stale draft from a different preset — silently ignore
     if (draft.presetId !== props.preset.id) return
-    // Basic structure check to guard against corrupted storage
     if (!draft.localPreset || typeof draft.localPreset.type !== 'string') {
       await clearDraft()
       return
     }
-    // Populate memory cache so subsequent tab switches are flash-free
     memoryCachedDraft.value = draft
     applyDraft(draft)
   } catch (e) {
     console.error('[PresetEditor] Failed to restore draft:', e)
-    // Non-fatal: falls back to saved preset state
   }
 }
 
-/**
- * Synchronous draft restore from memory cache — used by the preset-switch watcher
- * to avoid a storage round-trip (which would cause a visual flash).
- */
 function restoreDraftFromCache(presetId: string) {
   const draft = memoryCachedDraft.value
-  if (!draft) return
-  if (draft.presetId !== presetId) return
+  if (!draft || draft.presetId !== presetId) return
   if (!draft.localPreset || typeof draft.localPreset.type !== 'string') {
     memoryCachedDraft.value = null
     clearDraft().catch((e) =>
@@ -898,88 +458,25 @@ function restoreDraftFromCache(presetId: string) {
 // ─── Lifecycle ────────────────────────────────────────────────────
 
 onMounted(async () => {
-  customTransforms.value = await getAllCustomTransforms()
-  // Initialize presetConfig from localPreset (baseline)
   if (localPreset.value.type === 'translation' && localPreset.value.customProviderConfig) {
     presetConfig.value = { ...localPreset.value.customProviderConfig }
   }
-  // Initialize LLM model selection state (baseline)
   if (localPreset.value.type === 'llm-prompt') {
     const llmPreset = localPreset.value as LLMPromptPreset
     initLLMModelState(llmPreset.llmProvider, llmPreset.llmModel)
     initLLMCredentialDrafts(llmPreset.llmProvider)
   }
-  // Override baseline with persisted draft if one exists for this preset
   await restoreDraftIfValid()
 })
 
 // ─── Computed ─────────────────────────────────────────────────────
 
-// Full list of built-in styles for the style <select>
-const transformationStyles = computed(() => transformationEngine.getAllStyles())
+// Resolved model name (never 'custom') — used for save and dirty-check
+const resolvedLLMModel = computed(() =>
+  isCustomModel(llmModelSelection.value) ? llmCustomModelInput.value : llmModelSelection.value
+)
 
-// Currently selected custom transformation object (drives live preview)
-const selectedCustomTransform = computed(() => {
-  if (localPreset.value.type !== 'custom-transform') return null
-  const preset = localPreset.value
-  return customTransforms.value.find((ct) => ct.id === preset.customTransformId) ?? null
-})
-
-// Applies the selected built-in style to the preview text
-const transformedPreview = computed(() => {
-  if (localPreset.value.type !== 'transformation') return ''
-  return transformationEngine.transform(
-    customExampleText.value,
-    localPreset.value.transformationStyle
-  )
-})
-
-// Applies the selected custom charMap to the preview text
-const customTransformPreview = computed(() => {
-  if (!selectedCustomTransform.value) return ''
-  return applyCustomCharMap(customExampleText.value, selectedCustomTransform.value.charMap)
-})
-
-// Get configuration for the currently selected custom provider
-const currentProviderConfig = computed(() => {
-  if (
-    localPreset.value.type !== 'translation' ||
-    !localPreset.value.useCustomProvider ||
-    !localPreset.value.customProvider
-  ) {
-    return null
-  }
-  return getProviderConfig(localPreset.value.customProvider)
-})
-
-// Predefined model list for the current LLM prompt provider (excludes 'custom' provider which has no list)
-const llmAvailableModels = computed((): ModelOption[] => {
-  if (localPreset.value.type !== 'llm-prompt') return []
-  const provider = (localPreset.value as LLMPromptPreset).llmProvider
-  if (provider === 'custom') return []
-  return (PREDEFINED_MODELS as Record<string, ModelOption[]>)[provider] || []
-})
-
-// True when the current LLM provider has at least one non-custom predefined model (show dropdown)
-const llmHasPredefinedModels = computed(() => llmAvailableModels.value.some((m) => !m.isCustom))
-
-// Provider config metadata (requiresApiKey, requiresBaseUrl, defaultBaseUrl) for the selected LLM provider
-// Reuses the same getProviderConfig() used by translation mode — single source of truth
-const llmCurrentProviderConfig = computed(() => {
-  if (localPreset.value.type !== 'llm-prompt') return null
-  const provider = (localPreset.value as LLMPromptPreset).llmProvider
-  if (!provider) return null
-  return getProviderConfig(provider as TranslationProvider)
-})
-
-// Local drafts for the global provider credentials (api key, base url).
-// Written to providerConfigs only on save — so the save/undo buttons appear as expected.
-const llmApiKeyDraft = ref('')
-const llmBaseUrlDraft = ref('')
-
-// Computed "originals" — always reflect the value currently saved in providerConfigs.
-// Using computed (instead of manually-set refs) avoids the race condition where
-// initLLMCredentialDrafts runs before the async storage load completes.
+// Originals computed from global providerConfigs — never go stale like refs would
 const llmApiKeyOriginal = computed(() => {
   if (localPreset.value.type !== 'llm-prompt') return ''
   const provider = (localPreset.value as LLMPromptPreset).llmProvider
@@ -993,12 +490,7 @@ const llmBaseUrlOriginal = computed(() => {
   return cfg?.baseUrl ?? ''
 })
 
-// The resolved model name based on the current selection state
-const resolvedLLMModel = computed(() =>
-  isCustomModel(llmModelSelection.value) ? llmCustomModelInput.value : llmModelSelection.value
-)
-
-// Per-type dirty check against the original prop
+// Per-type dirty check
 const hasUnsavedChanges = computed(() => {
   if (localPreset.value.type !== props.preset.type) return true
 
@@ -1010,29 +502,26 @@ const hasUnsavedChanges = computed(() => {
       localPreset.value.keyboardShortcut !== props.preset.keyboardShortcut ||
       localPreset.value.useCustomProvider !== props.preset.useCustomProvider ||
       localPreset.value.customProvider !== props.preset.customProvider
-
     if (baseChanged) return true
-
-    // Check if customProviderConfig has changed
     if (localPreset.value.useCustomProvider && localPreset.value.customProvider) {
-      const configChanged =
+      return (
         JSON.stringify(presetConfig.value) !==
         JSON.stringify(props.preset.customProviderConfig || {})
-      if (configChanged) return true
+      )
     }
-
     return false
-  } else if (
-    localPreset.value.type === 'transformation' &&
-    props.preset.type === 'transformation'
-  ) {
+  }
+
+  if (localPreset.value.type === 'transformation' && props.preset.type === 'transformation') {
     return (
       localPreset.value.name !== props.preset.name ||
       localPreset.value.transformationStyle !== props.preset.transformationStyle ||
       localPreset.value.exampleText !== props.preset.exampleText ||
       localPreset.value.keyboardShortcut !== props.preset.keyboardShortcut
     )
-  } else if (
+  }
+
+  if (
     localPreset.value.type === 'custom-transform' &&
     props.preset.type === 'custom-transform'
   ) {
@@ -1041,31 +530,30 @@ const hasUnsavedChanges = computed(() => {
       localPreset.value.customTransformId !== props.preset.customTransformId ||
       localPreset.value.keyboardShortcut !== props.preset.keyboardShortcut
     )
-  } else if (localPreset.value.type === 'llm-prompt' && props.preset.type === 'llm-prompt') {
+  }
+
+  if (localPreset.value.type === 'llm-prompt' && props.preset.type === 'llm-prompt') {
     return (
       localPreset.value.name !== props.preset.name ||
       localPreset.value.prompt !== props.preset.prompt ||
       localPreset.value.llmProvider !== props.preset.llmProvider ||
-      // Compare the resolved model (not the raw selection) against the saved value
       resolvedLLMModel.value !== props.preset.llmModel ||
       localPreset.value.keyboardShortcut !== props.preset.keyboardShortcut ||
-      // Credential drafts are dirty if they differ from the originals captured at init/undo
       llmApiKeyDraft.value !== llmApiKeyOriginal.value ||
       llmBaseUrlDraft.value !== llmBaseUrlOriginal.value
     )
   }
+
   return true
 })
 
 // ─── Watchers ─────────────────────────────────────────────────────
 
-// Auto-save draft whenever any editor field changes
 watch(localPreset, scheduleDraftSave, { deep: true })
 watch(presetConfig, scheduleDraftSave, { deep: true })
 watch(llmModelSelection, scheduleDraftSave)
 watch(llmCustomModelInput, scheduleDraftSave)
 watch(customExampleText, scheduleDraftSave)
-// Credential drafts need explicit watchers — they are refs not tied to localPreset
 watch(llmApiKeyDraft, scheduleDraftSave)
 watch(llmBaseUrlDraft, scheduleDraftSave)
 
@@ -1078,13 +566,11 @@ watch(
     if (newPreset.type === 'transformation' && newPreset.exampleText) {
       customExampleText.value = newPreset.exampleText
     }
-    // Sync presetConfig from preset.customProviderConfig
     if (newPreset.type === 'translation' && newPreset.customProviderConfig) {
       presetConfig.value = { ...newPreset.customProviderConfig }
     } else {
       presetConfig.value = {}
     }
-    // Sync LLM model selection state and credential drafts
     if (newPreset.type === 'llm-prompt') {
       const llmPreset = newPreset as LLMPromptPreset
       initLLMModelState(llmPreset.llmProvider, llmPreset.llmModel)
@@ -1093,7 +579,6 @@ watch(
       llmModelSelection.value = ''
       llmCustomModelInput.value = ''
     }
-    // Restore draft synchronously from memory cache — no storage round-trip, no visual flash
     restoreDraftFromCache(newPreset.id)
   },
   { deep: true }
@@ -1101,75 +586,6 @@ watch(
 
 // ─── Mode switching ──────────────────────────────────────────────
 
-/**
- * Get provider-specific configuration defaults and requirements
- */
-function getProviderConfig(provider: TranslationProvider) {
-  const providerOption = AVAILABLE_PROVIDERS.find((p) => p.value === provider)
-  const isLLM = providerOption?.isLLM ?? false
-  const requiresApiKey = providerOption?.requiresApiKey ?? false
-
-  const config = {
-    requiresApiKey,
-    requiresBaseUrl: false,
-    defaultBaseUrl: '',
-    defaultModel: '',
-    availableModels: [] as ModelOption[],
-  }
-
-  if (isLLM && provider !== 'custom') {
-    const providerKey = provider as keyof typeof PREDEFINED_MODELS
-    config.availableModels = PREDEFINED_MODELS[providerKey] || []
-    config.defaultModel = getDefaultModel(providerKey)
-  }
-
-  switch (provider) {
-    case 'chatgpt':
-      config.requiresBaseUrl = true
-      config.defaultBaseUrl = PROVIDER_BASE_URLS.chatgpt
-      break
-    case 'groq':
-      config.requiresBaseUrl = true
-      config.defaultBaseUrl = PROVIDER_BASE_URLS.groq
-      break
-    case 'ollama':
-      config.requiresBaseUrl = true
-      config.defaultBaseUrl = PROVIDER_BASE_URLS.ollama
-      break
-    case 'openrouter':
-      config.requiresBaseUrl = true
-      config.defaultBaseUrl = PROVIDER_BASE_URLS.openrouter
-      break
-    case 'custom':
-      config.requiresBaseUrl = true
-      break
-  }
-
-  return config
-}
-
-/**
- * Handle custom provider change - RESET config (no memorization for presets)
- */
-function onCustomProviderChange() {
-  if (localPreset.value.type !== 'translation') return
-  const provider = localPreset.value.customProvider
-  if (!provider) {
-    presetConfig.value = {}
-    return
-  }
-
-  // RESET completely - don't keep old values when changing provider
-  const config = getProviderConfig(provider)
-  presetConfig.value = {
-    baseUrl: config.defaultBaseUrl || undefined,
-    model: config.defaultModel || undefined,
-  }
-}
-
-/**
- * Type guard to validate if a value is a valid preset type.
- */
 function isValidPresetType(
   value: unknown
 ): value is 'translation' | 'transformation' | 'custom-transform' | 'llm-prompt' {
@@ -1178,9 +594,6 @@ function isValidPresetType(
   )
 }
 
-/**
- * Reconstruct the preset shape for the new mode, preserving base fields.
- */
 function handleModeChange(
   newType: 'translation' | 'transformation' | 'custom-transform' | 'llm-prompt'
 ) {
@@ -1193,12 +606,7 @@ function handleModeChange(
 
   switch (newType) {
     case 'translation':
-      localPreset.value = {
-        ...base,
-        type: 'translation',
-        sourceLang: 'auto',
-        targetLang: 'en',
-      } as Preset
+      localPreset.value = { ...base, type: 'translation', sourceLang: 'auto', targetLang: 'en' }
       break
     case 'transformation':
       localPreset.value = {
@@ -1206,24 +614,17 @@ function handleModeChange(
         type: 'transformation',
         transformationStyle: 'strikethrough',
         exampleText: customExampleText.value,
-      } as Preset
+      }
       break
     case 'custom-transform':
-      localPreset.value = {
-        ...base,
-        type: 'custom-transform',
-        customTransformId: '',
-      } as Preset
+      localPreset.value = { ...base, type: 'custom-transform', customTransformId: '' }
       break
     case 'llm-prompt': {
-      // Auto-suggest the LLM provider when the global translation provider is also an LLM
       const suggestedProvider = (
         props.globalProvider && PROVIDER_TO_LLM[props.globalProvider]
           ? PROVIDER_TO_LLM[props.globalProvider]
           : 'gemini'
       ) as LLMProvider
-      // Use the model already configured globally for this provider (covers 'custom' which has
-      // no predefined list), then fall back to the first predefined model as a last resort
       const globalCfg = providerConfigs.value[
         suggestedProvider as keyof ProviderConfigs
       ] as { model?: string } | undefined
@@ -1237,10 +638,8 @@ function handleModeChange(
         prompt: '',
         llmProvider: suggestedProvider,
         llmModel: defaultModel,
-      } as Preset
-      // Sync local selection state to the default model
+      }
       initLLMModelState(suggestedProvider, defaultModel)
-      // Initialise credential drafts for the suggested provider
       initLLMCredentialDrafts(suggestedProvider)
       break
     }
@@ -1250,79 +649,63 @@ function handleModeChange(
 
 // ─── Pin ─────────────────────────────────────────────────────────
 
-/**
- * Handle pin checkbox change.
- * Disabled at the DOM level when already pinned, so this only fires when pinning a new preset.
- */
 function handlePinChange() {
   emit('set-pinned', props.preset.id)
 }
 
-// ─── Undo / Options ──────────────────────────────────────────────
+// ─── Undo ────────────────────────────────────────────────────────
 
-/** Revert local state to the last-saved prop */
 function undoChanges() {
   localPreset.value = { ...props.preset }
   shortcutError.value = ''
   if (props.preset.type === 'transformation' && props.preset.exampleText) {
     customExampleText.value = props.preset.exampleText
   }
-  // Restore presetConfig
   if (props.preset.type === 'translation' && props.preset.customProviderConfig) {
     presetConfig.value = { ...props.preset.customProviderConfig }
   } else {
     presetConfig.value = {}
   }
-  // Restore LLM model selection state and credential drafts
   if (props.preset.type === 'llm-prompt') {
     initLLMModelState(
       (props.preset as LLMPromptPreset).llmProvider,
       (props.preset as LLMPromptPreset).llmModel
     )
-    // Reset drafts to the last-saved values (re-reads from global providerConfigs)
     initLLMCredentialDrafts((props.preset as LLMPromptPreset).llmProvider)
   }
-  // Remove persisted draft so it does not restore on next popup open
   memoryCachedDraft.value = null
   clearDraft().catch((e) => console.error('[PresetEditor] Failed to clear draft on undo:', e))
 }
 
-/** Navigate to the extension options page (custom-transform manager) */
-function openOptionsPage() {
-  chrome.runtime.openOptionsPage()
-}
-
 // ─── Shortcut input ──────────────────────────────────────────────
 
-/** Capture keys inside the shortcut field and build the shortcut string */
 function handleShortcutInput(event: KeyboardEvent) {
   if (event.key === 'Backspace' || event.key === 'Delete') {
     sequenceDetector.reset()
     return
   }
   event.preventDefault()
-
   const sequenceShortcut = sequenceDetector.processKeyDown(event)
   const simpleShortcut = buildShortcutFromEvent(event)
   const shortcut = sequenceShortcut || simpleShortcut
-
   if (shortcut) {
     localPreset.value.keyboardShortcut = shortcut
     validateShortcut()
   }
 }
 
-/** Reset the sequence detector on key release */
 function handleShortcutKeyUp(event: KeyboardEvent) {
   sequenceDetector.processKeyUp(event)
 }
 
 // ─── Validation ──────────────────────────────────────────────────
 
-/**
- * Format check + uniqueness check for the shortcut string.
- * Also checks for prefix conflicts (e.g., Alt+T vs Alt+T+1).
- */
+function showValidationError(title: string, message: string) {
+  validationDialogTitle.value = title
+  validationDialogMessage.value = message
+  showValidationDialog.value = true
+}
+
 function validateShortcut(): boolean {
   const shortcut = localPreset.value.keyboardShortcut.trim()
 
@@ -1341,13 +724,11 @@ function validateShortcut(): boolean {
   const modifiers = ['ctrl', 'alt', 'shift', 'meta', 'control', 'cmd', 'command', 'super']
   const keys = tokens.filter((token) => !modifiers.includes(token.toLowerCase()))
 
-  // REJECT modifier-only shortcuts (Alt, Ctrl, Shift, Meta alone)
   if (keys.length === 0) {
     shortcutError.value =
       t('shortcutModifierOnly') || 'Modifier-only shortcuts (Alt, Ctrl, etc.) are not allowed'
     return false
   }
-
   if (keys.length > 2) {
     shortcutError.value = t('shortcutTooManyKeys')
     return false
@@ -1359,26 +740,17 @@ function validateShortcut(): boolean {
     return false
   }
 
-  // Check for exact duplicates
   const duplicate = props.allPresets.find(
     (p) => p.id !== props.preset.id && normalizeShortcut(p.keyboardShortcut) === normalizedShortcut
   )
-
   if (duplicate) {
     shortcutError.value = t('shortcutDuplicate', { params: { name: duplicate.name } })
     return false
   }
 
-  // Check for prefix conflicts
-  // A conflict exists if:
-  // - New shortcut is a prefix of an existing one (e.g., Alt+T vs existing Alt+T+1)
-  // - An existing shortcut is a prefix of the new one (e.g., existing Alt+T vs new Alt+T+1)
   for (const preset of props.allPresets) {
     if (preset.id === props.preset.id) continue
-
     const existingNormalized = normalizeShortcut(preset.keyboardShortcut)
-
-    // Check if new is a prefix of existing (e.g., Alt+T vs Alt+T+1)
     if (existingNormalized.startsWith(normalizedShortcut + '+')) {
       shortcutError.value = `Conflict: "${normalizedShortcut}" is a prefix of "${existingNormalized}" (${preset.name})`
       showValidationError(
@@ -1387,8 +759,6 @@ function validateShortcut(): boolean {
       )
       return false
     }
-
-    // Check if existing is a prefix of new (e.g., existing Alt+T vs new Alt+T+1)
     if (normalizedShortcut.startsWith(existingNormalized + '+')) {
       shortcutError.value = `Conflict: "${existingNormalized}" (${preset.name}) is a prefix of "${normalizedShortcut}"`
       showValidationError(
@@ -1403,22 +773,6 @@ function validateShortcut(): boolean {
   return true
 }
 
-// ─── Save / Delete ───────────────────────────────────────────────
-
-/**
- * Display validation error dialog
- */
-function showValidationError(title: string, message: string) {
-  validationDialogTitle.value = title
-  validationDialogMessage.value = message
-  showValidationDialog.value = true
-}
-
-/**
- * Run a live credential check via PROXY_FETCH.
- * Sets isSaving while in-flight. Shows an error dialog and returns false on failure.
- * Returns true when the credentials are valid (or validation is skipped for the provider).
- */
 async function validateCredentials(
   provider: string,
   apiKey: string,
@@ -1440,7 +794,8 @@ async function validateCredentials(
   }
 }
 
-/** Type-specific validation then emit the updated preset */
+// ─── Save / Delete ───────────────────────────────────────────────
+
 async function savePreset() {
   if (isSaving.value) return
   if (!validateShortcut()) return
@@ -1450,7 +805,6 @@ async function savePreset() {
       console.error('[PresetEditor] Transformation style required')
       return
     }
-    // Persist the example text into the preset payload
     if (customExampleText.value !== localPreset.value.exampleText) {
       localPreset.value.exampleText = customExampleText.value
     }
@@ -1459,7 +813,6 @@ async function savePreset() {
       console.error('[PresetEditor] Source and target languages required')
       return
     }
-    // Validate custom provider if enabled
     if (localPreset.value.useCustomProvider) {
       if (!localPreset.value.customProvider) {
         showValidationError(
@@ -1468,10 +821,7 @@ async function savePreset() {
         )
         return
       }
-
       const config = getProviderConfig(localPreset.value.customProvider)
-
-      // Validate required fields based on provider configuration
       if (config.requiresApiKey && !presetConfig.value.apiKey) {
         showValidationError(
           t('validationError') || 'Validation Error',
@@ -1479,7 +829,6 @@ async function savePreset() {
         )
         return
       }
-
       if (config.requiresBaseUrl && !presetConfig.value.baseUrl) {
         showValidationError(
           t('validationError') || 'Validation Error',
@@ -1487,8 +836,6 @@ async function savePreset() {
         )
         return
       }
-
-      // Validate model for LLM providers
       if (config.availableModels.length > 0) {
         const effectiveModel = getEffectiveModel(
           presetConfig.value.model || '',
@@ -1502,15 +849,12 @@ async function savePreset() {
           return
         }
       } else if (localPreset.value.customProvider === 'custom' && !presetConfig.value.model) {
-        // For custom provider, model is always required
         showValidationError(
           t('validationError') || 'Validation Error',
           'Model is required for custom provider'
         )
         return
       }
-
-      // Validate credentials if they changed from the saved state
       const savedConfig =
         props.preset.type === 'translation' ? props.preset.customProviderConfig : undefined
       const credentialsChanged =
@@ -1524,8 +868,6 @@ async function savePreset() {
         )
         if (!ok) return
       }
-
-      // Copy presetConfig to localPreset.customProviderConfig before saving
       localPreset.value.customProviderConfig = { ...presetConfig.value }
     }
   } else if (localPreset.value.type === 'custom-transform') {
@@ -1551,7 +893,6 @@ async function savePreset() {
       )
       return
     }
-    // Resolve the effective model from the local selection state
     const effectiveModel = resolvedLLMModel.value
     if (!effectiveModel) {
       showValidationError(
@@ -1560,10 +901,8 @@ async function savePreset() {
       )
       return
     }
-    // Persist the resolved model name (never 'custom') into the preset
     localPreset.value.llmModel = effectiveModel
 
-    // Validate credentials if they changed from the last-saved values
     const credentialsChanged =
       llmApiKeyDraft.value !== llmApiKeyOriginal.value ||
       llmBaseUrlDraft.value !== llmBaseUrlOriginal.value
@@ -1576,7 +915,7 @@ async function savePreset() {
       if (!ok) return
     }
 
-    // Flush credential drafts to global providerConfigs on save
+    // Flush credential drafts to global providerConfigs
     const provider = localPreset.value.llmProvider
     const cfg = providerConfigs.value[provider as keyof ProviderConfigs] as {
       apiKey?: string
@@ -1586,18 +925,14 @@ async function savePreset() {
       if ('apiKey' in cfg) cfg.apiKey = llmApiKeyDraft.value
       if ('baseUrl' in cfg) cfg.baseUrl = llmBaseUrlDraft.value
     }
-    // No need to update originals manually — they are computed from providerConfigs,
-    // so once we write to providerConfigs above, hasUnsavedChanges resets automatically
   }
 
   emit('update-preset', { ...localPreset.value })
-  // Remove persisted draft now that the preset is officially saved
   memoryCachedDraft.value = null
   clearDraft().catch((e) => console.error('[PresetEditor] Failed to clear draft on save:', e))
   console.log('[PresetEditor] Preset saved:', localPreset.value)
 }
 
-/** Forward delete after dialog confirmation */
 function handleDeleteConfirm() {
   showDeleteDialog.value = false
   emit('delete-preset', props.preset.id)
@@ -1607,12 +942,5 @@ function handleDeleteConfirm() {
 <style scoped>
 .preset-editor {
   padding-bottom: 0.5rem;
-}
-
-/* MathSymbols @font-face is declared in popup.html */
-.preview-transformed {
-  font-family:
-    'MathSymbols', ui-monospace, 'Cascadia Code', 'Source Code Pro', 'Menlo', 'Consolas',
-    'Courier New', monospace;
 }
 </style>
